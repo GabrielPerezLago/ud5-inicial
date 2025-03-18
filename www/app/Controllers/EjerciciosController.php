@@ -17,7 +17,11 @@ class EjerciciosController extends BaseController
 
     public function ejercicioDos()
     {
-
+        $data = array(
+            'titulo' => 'Ejercicio 2',
+            'breadcrumb' => ['Inicio', 'Ejercicio 2']
+        );
+        $this->view->showViews(array('templates/header.view.php', 'ejercicioDos.view.php', 'templates/footer.view.php'), $data);
     }
 
 }

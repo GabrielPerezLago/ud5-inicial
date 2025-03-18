@@ -11,7 +11,12 @@ class FrontController
 {
     public static function main(): void
     {
-
+        /**
+         * @EjercicioUno
+         *
+         * Estas son las rutas del ejercicio 1
+         *
+         *  */
         Route::add(
             '/ejercicioUno',
             function () {
@@ -30,7 +35,34 @@ class FrontController
             'post'
         );
 
+        /**
+         * @EjercicioDos
+         *
+         * Estas son las rutas del ejercicio 2
+         *
+         */
 
+        Route::add(
+            '/ejercicioDos',
+            function () {
+                $controller = new EjerciciosController();
+                $controller->ejercicioDos();
+            },
+            'get'
+        );
+
+        Route::add(
+            '/ejercicioDos',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->ejercicioDos();
+            },
+            'post'
+        );
+
+        /**
+         * @ControladoresDefault
+         */
 
         Route::add(
             '/',
