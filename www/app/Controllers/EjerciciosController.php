@@ -15,5 +15,9 @@ class EjerciciosController extends BaseController
         $this->view->showViews(array('templates/header.view.php', 'ejercicioUno.view.php', 'templates/footer.view.php'), $data);
     }
 
+    public function ejercicioDos()
+    {
+
+    }
 
 }
