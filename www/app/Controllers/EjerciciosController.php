@@ -24,14 +24,14 @@ class EjerciciosController extends BaseController
             'numeroDos' => $_POST['numeroDos']
         );
 
-        if (isset($data['numeroUno']) && isset($data['numeroDos'])) {
+        if (empty($_POST['numeroUno']) || empty($_POST['numeroDos'])) {
+           $data['resultado'] = 'Inserte los dos numeros porfavor';
+        }else {
             if (filter_var($data['numeroDos'], FILTER_VALIDATE_FLOAT) && filter_var($data['numeroDos'], FILTER_VALIDATE_FLOAT)) {
                 $data['resultado'] = $data['numeroUno'] * $data['numeroDos'];
             } else {
                 $data['resultado'] = 'Error: Parametros no validos , debe insertar numeros.';
             }
-        }else {
-            $data['resultado'] = 'Inserte los dos numeros porfavor.';
         }
 
         $this->view->showViews(array('templates/header.view.php', 'ejercicioDos.view.php', 'templates/footer.view.php'), $data);
