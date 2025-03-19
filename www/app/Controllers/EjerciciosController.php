@@ -76,13 +76,14 @@ class EjerciciosController extends BaseController
         );
 
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $data['errors'] = $this->checkErrorsEjerecicio3($_POST);
-        if (empty($data['errors'])) {
+        $data['errors'] = $this->checkErrorsEjerecicio3();
+        if($data['errors'] === []) {
             $data['resultado'] = max($_POST['numeroUno'], $_POST['numeroDos'], $_POST['numeroTres']);
         }
         $this->view->showViews(array('templates/header.view.php', 'ejercicioTres.view.php', 'templates/footer.view.php'), $data);
 
     }
+
 
     /**
      * @return void
@@ -90,6 +91,8 @@ class EjerciciosController extends BaseController
      * @CheckErrors
      *
      * Esta funcion se encarga de validar inputs
+     * Esta funcion solo funciona para el ejercicio 3 , donde se dedica a validar los inputs
+     *
      */
     private function checkErrorsEjerecicio3()
     {

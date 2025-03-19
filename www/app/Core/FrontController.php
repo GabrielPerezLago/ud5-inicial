@@ -77,7 +77,7 @@ class FrontController
         );
 
         Route::add(
-            'ejercicioTres',
+            '/ejercicioTres',
             function (){
                 $controller = new EjerciciosController();
                 $controller->ejercicioTres();
