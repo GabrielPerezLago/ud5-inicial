@@ -6,6 +6,15 @@ use Com\Daw2\Core\BaseController;
 
 class EjerciciosController extends BaseController
 {
+    /**
+     * @return void
+     * @throws \Exception
+     * @EjercicioUno
+     *
+     * Recibe un nombre y muestra un texto con ese nombre.
+     *
+     */
+
     public function ejercicioUno() {
         $data = array(
             'titulo' => 'Ejercicio 1',
@@ -14,6 +23,20 @@ class EjerciciosController extends BaseController
         );
         $this->view->showViews(array('templates/header.view.php', 'ejercicioUno.view.php', 'templates/footer.view.php'), $data);
     }
+
+    /**
+     * @return void
+     * @throws \Exception
+     * @EjercicioDos
+     *
+     * Recoje dos numeros y tras limpiar el input para que solo permita numeros,
+     * multiplica los dos numeros anteriormente recibidos.
+     *
+     * @Errores
+     * Un queda por solucionar los errores de las variables numeroUno y numeroDos,
+     * Estas se encuentran bacias al iniciar la pagina.
+     *
+     */
 
     public function ejercicioDos()
     {
@@ -35,6 +58,31 @@ class EjerciciosController extends BaseController
         }
 
         $this->view->showViews(array('templates/header.view.php', 'ejercicioDos.view.php', 'templates/footer.view.php'), $data);
+    }
+
+    /**
+     * @return void
+     *
+     * @EjercicioTres
+     *
+     * Recoje tres numeros y muestra el mayor.
+     *
+     */
+    public function ejercicioTres()
+    {
+
+    }
+
+    /**
+     * @return void
+     *
+     * @CheckErrors
+     *
+     * Esta funcion se encarga de validar inputs
+     */
+    private function checkErrors()
+    {
+
     }
 
 }

@@ -61,6 +61,31 @@ class FrontController
         );
 
         /**
+         * @EjercicioTres
+         *
+         * Estas son las rutas del ejercicio 3
+         *
+         */
+
+        Route::add(
+            '/ejercicioTres',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->ejercicioTres();
+            },
+            'get'
+        );
+
+        Route::add(
+            'ejercicioTres',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->ejercicioTres();
+            },
+            'post'
+        );
+
+        /**
          * @ControladoresDefault
          */
 
