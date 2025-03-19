@@ -70,6 +70,17 @@ class EjerciciosController extends BaseController
      */
     public function ejercicioTres()
     {
+        $data = array(
+            'titulo' => 'Ejercicio 3',
+            'breadcrumb' => ['Inicio', 'Ejercicio 3'],
+        );
+
+        $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $data['errors'] = $this->checkErrorsEjerecicio3($_POST);
+        if (empty($data['errors'])) {
+            $data['resultado'] = max($_POST['numeroUno'], $_POST['numeroDos'], $_POST['numeroTres']);
+        }
+        $this->view->showViews(array('templates/header.view.php', 'ejercicioTres.view.php', 'templates/footer.view.php'), $data);
 
     }
 
@@ -80,9 +91,28 @@ class EjerciciosController extends BaseController
      *
      * Esta funcion se encarga de validar inputs
      */
-    private function checkErrors()
+    private function checkErrorsEjerecicio3()
     {
+        $errors = [];
+        if(!isset($data['numeroUno']) || $data['numeroUno'] === '') {
+            $errors['numeroUno'] = 'Inserte el numero porfavor';
+        }elseif (filter_var($data['numeroUno'], FILTER_VALIDATE_FLOAT) === false) {
+            $errors['numeroUno'] = 'El valor introducido debe de ser un numero';
+        }
 
+        if(!isset($data['numeroDos']) || $data['numeroDos'] === '') {
+            $errors['numeroDos'] = 'Inserte el numero porfavor';
+        }  elseif (filter_var($data['numeroDos'], FILTER_VALIDATE_FLOAT) === false) {
+            $errors['numeroDos'] = 'El valor introducido debe de ser un numero';
+        }
+
+        if(!isset($data['numeroTres']) || $data['numeroTres'] === '') {
+            $errors['numeroTres'] = 'Inserte el numero porfavor';
+        }elseif (filter_var($data['numeroTres'], FILTER_VALIDATE_FLOAT) === false) {
+            $errors['numeroTres']= 'El valor introducido debe de ser un numero';
+        }
+
+        return $errors;
     }
 
 }
