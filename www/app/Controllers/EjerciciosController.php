@@ -133,8 +133,8 @@ class EjerciciosController extends BaseController
     /**
      * @EjerecicioCuatro
      *
-     * Recibe una cadena de texto como entrada.
-     * Depurarla, eliminando espacios en blanco y asegurándonos de que solo contenga letras.
+     * Recibe una cadena de texto como entrada. **Listo
+     * Depurarla, eliminando espacios en blanco y asegurándonos de que solo contenga letras.**Listo
      * Contar la cantidad de veces que aparece cada letra en la cadena.
      * Ordenar las letras según la cantidad de veces que aparecen, de mayor a menor.
      * Devolver el resultado ordenado.
@@ -162,6 +162,12 @@ class EjerciciosController extends BaseController
      *
      * @Ejercicio
      * Esta funcion es la que ejecuta el metodo que se realizara en el ejercicio 4
+     *
+     *  Recibe una cadena de texto como entrada. **Listo
+     *  Depurarla, eliminando espacios en blanco y asegurándonos de que solo contenga letras.**Listo
+     *  Contar la cantidad de veces que aparece cada letra en la cadena.
+     *  Ordenar las letras según la cantidad de veces que aparecen, de mayor a menor.
+     *  Devolver el resultado ordenado.
      */
 
     public function doEjerecicioCuatro()
@@ -173,8 +179,11 @@ class EjerciciosController extends BaseController
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $data['errors'] = $this->checkErrorsEjercicioCuatro($_POST);
         if($data['errors'] === []){
-            $data['resultado'] = $_POST['texto'];
-            }
+//            $data['resultado'] = str_replace(' ', '' , $_POST['texto']);
+//            $data['letras'] = str_split($data['resultado']);
+
+            $data['resultados'] = str_split(str_replace(' ', '', $_POST['texto']));
+        }
         $this->view->showViews(array('templates/header.view.php', 'ejercicioCuatro.view.php', 'templates/footer.view.php'), $data);
 
     }
