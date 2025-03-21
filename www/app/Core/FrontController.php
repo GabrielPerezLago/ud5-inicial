@@ -86,6 +86,34 @@ class FrontController
         );
 
         /**
+         * @EjercicioCuatro
+         *
+         * Estas son las rutas del ejerecicio 4
+         *
+         */
+
+        Route::add(
+            '/ejercicioCuatro',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->ejercicioCuatro();
+            },
+            'get'
+        );
+
+        Route::add(
+            '/ejercicioCuatro',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->doEjerecicioCuatro();
+            },
+            'post'
+        );
+
+
+
+
+        /**
          * @ControladoresDefault
          */
 
