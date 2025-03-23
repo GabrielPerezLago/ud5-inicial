@@ -110,7 +110,30 @@ class FrontController
             'post'
         );
 
+        /**
+         * @NotasAlumnos
+         *
+         * Rutas del ejercicio que notasAlumnos
+         *
+         */
 
+        Route::add(
+            '/notasALumnos',
+            function() {
+                $controller = new EjerciciosController();
+                $controller->notasALumnos();
+            },
+        'get'
+        );
+
+        Route::add(
+            '/notasALumnos',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->doNotasAulumnos();
+            },
+            'post'
+        );
 
 
         /**

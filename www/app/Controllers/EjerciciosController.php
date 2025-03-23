@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Com\Daw2\Controllers;
 
+use Cassandra\Map;
 use Com\Daw2\Core\BaseController;
 
 class EjerciciosController extends BaseController
@@ -129,7 +130,7 @@ class EjerciciosController extends BaseController
         return $errors;
     }
 
-
+    /******                                 Ejercicio 4                               *******/
     /**
      * @EjerecicioCuatro
      *
@@ -165,7 +166,7 @@ class EjerciciosController extends BaseController
      *
      *  Recibe una cadena de texto como entrada. **Listo
      *  Depurarla, eliminando espacios en blanco y asegurándonos de que solo contenga letras.**Listo
-     *  Contar la cantidad de veces que aparece cada letra en la cadena.
+     *  Contar la cantidad de veces que aparece cada letra en la cadena. **Listo
      *  Ordenar las letras según la cantidad de veces que aparecen, de mayor a menor.
      *  Devolver el resultado ordenado.
      */
@@ -179,10 +180,13 @@ class EjerciciosController extends BaseController
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $data['errors'] = $this->checkErrorsEjercicioCuatro($_POST);
         if($data['errors'] === []){
-//            $data['resultado'] = str_replace(' ', '' , $_POST['texto']);
-//            $data['letras'] = str_split($data['resultado']);
+            // Limpiar el codigo , reducir la cantidad de este y hacerlo mas legible.
 
-            $data['resultados'] = str_split(str_replace(' ', '', $_POST['texto']));
+
+            $data['textoLimpio'] = str_replace(' ', '', $_POST['texto']);
+            $data['letras'] = str_split($data['textoLimpio']);
+            $data['cuentaLetras'] = array_count_values($data['letras']);
+            arsort($data['cuentaLetras']);
         }
         $this->view->showViews(array('templates/header.view.php', 'ejercicioCuatro.view.php', 'templates/footer.view.php'), $data);
 
@@ -211,4 +215,193 @@ class EjerciciosController extends BaseController
     }
 
 
+    /******                                 Ejrecicio nostas ALumnos                                 *******/
+
+    /**
+     * @return void
+     * @NotasAlumnos
+     *
+     * Esta es la funcion que se encarga de la vista del ejercicio
+     *
+     */
+
+    public function notasAlumnos()
+    {
+        $data = array(
+            'titulo' => 'Notas Aulumnos',
+            'breadcrumb' => ['Inicio', 'Notas Aulumnos']
+        );
+
+        $this->view->showViews(array('templates/header.view.php', 'notasAlumnos.view.php', 'templates/footer.view.php'), $data);
+    }
+
+    /**
+     * @return void
+     * @main
+     * @DoNotasAlumnos
+     *
+     * Esta funcion es la que se encarga del manejo de
+     * lo que vamos a realizar en este ejercicio
+     *
+     */
+
+
+    public function doNotasAulumnos()
+    {
+        $data = array(
+            'titulo' => 'Notas Alumnos',
+            'breadcrumb' => ['Inicio', 'Notas Alumnos']
+        );
+        $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $data['datosRecibidos'] = $_POST['notas'];
+        if(isset($data['datosRecibidos'])) {
+            /**
+             * La variable $datosJson es la que se encarga de almacenar el json validado y transformado en array
+             */
+            $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
+            if($data['datosJson'] && is_array($data['datosJson'])) {
+                /**
+                 * Estas dos variables son las que se encargan de almacenar todos los datos.
+                 * Siendo que $_datos almacena el JSON puro y $_resultados almacena los datos de las medias etc...
+                 *
+                 */
+
+                $data['_resultados'] = $this->manejoCalculoNotas($data['datosJson']);
+                $data['_datos'] = $data['datosJson'];
+
+
+
+            } else {
+                $data['error'] = 'Error: El texto introducido debe esta en formato Json.';
+            }
+        }
+        $this->view->showViews(array('templates/header.view.php', 'notasALumnos.view.php', 'templates/footer.view.php'), $data);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     * @manejoCalculoNotas
+     *
+     * Esta funcion es la que se encarga de realizar las operaciones sobre el json que se le pase como parametro
+     *
+     */
+    private function manejoCalculoNotas(array $data) : array
+    {
+        $medias  = [];
+        $aprobados  = [];
+        $suspensos = [];
+        $notaMaxima = null;
+        $notaMinima = null;
+
+        // La variable resultados sera la encargada de almacenar los datos,
+            // de la nota minima , maxima , las medias y los aprobados/suspensos de cada asignatura.
+        $resultados = [];
+
+        foreach ($data as $asignaturas => $notas){
+
+            /**  Nostas Medias */
+            // Calcula las medias de las notas de cada asignatura.
+            $media = array_sum($notas) / count($notas);
+            $medias = $media;
+
+            /** Aprobados y Suspensos */
+            // Calcula la cantidad de aprobados y suspensos de cada asignatura.
+            $alumnosAprobados =[];
+            $alumnosSuspensos = [];
+            foreach($notas as $nota){
+                if ($nota >= 5){
+                    $alumnosAprobados[] = $nota;
+                } else {
+                    $alumnosSuspensos[] = $nota;
+                }
+                // Guarda las el número de suspensos y aprobados de cada asignartura
+                $aprobados = count($alumnosAprobados);
+                $suspensos = count($alumnosSuspensos);
+
+            }
+
+            /** Notas minimas y maximas */
+
+            // Saca la nota minima y maxima de cada asignatura con el nombre del alumno que saco dicha nota.
+            $max = max($notas);
+            $min = min($notas);
+
+            // En el array_search le estas diciendo que con la nota maxima o minima te saque la clave de la nota equivalente a esta.
+            $alumnoNotaMax = array_search($max, $notas);
+            $alumnoNotaMin = array_search($min, $notas);
+            $notaMaxima = [
+                'alumno' => $alumnoNotaMax,
+                'nota' => $max
+            ];
+
+            $notaMinima = [
+                'alumno' => $alumnoNotaMin,
+                'nota' => $min
+            ];
+
+            // Esta es la variable $resultados almacenando los datos de todoas la operacions ya realizadas
+            $resultados[$asignaturas] = [
+                'media' => $medias,
+                'aprobados' => $aprobados,
+                'suspensos' => $suspensos,
+                'nota maxima' => $notaMaxima,
+                'nota minima' => $notaMinima
+            ];
+        }
+
+
+        return $resultados;
+
+    }
+
+
+    /**
+     * @param $data
+     * @return array
+     *
+     * @validateJsonAndTransformToArray
+     *
+     * Esta funcion se encarga de usando las otras funcines de validacion y transformacion del json,
+     * validar si el texto pasado esta en formato json y si es el caso este convertirlo en un array.
+     */
+
+    private function validateJsonAndTransformToArray($data) : array
+    {
+        if ($this->validarJson($data) == true) {
+            $datosJson = $this->transformJson($data);
+            if ($datosJson) {
+                return $datosJson;
+            }
+        }
+        return [];
+    }
+
+
+    /**
+     * @param $data
+     * @return bool
+     * @validarJson
+     * Esta funcion valida que el parametro recibido este en formato json
+     *
+     */
+
+    private function validarJson($data) : bool
+    {
+        json_decode($data);
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     * @transformJson
+     *
+     * Esta funcion transforma un texto en formato Json en un array
+     *
+     */
+    private function transformJson($data) : array
+    {
+       return json_decode($data, true);
+    }
 }

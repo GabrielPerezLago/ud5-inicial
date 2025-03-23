@@ -27,17 +27,25 @@
                     </div>
             </form>
             <?php
-            if(!empty($resultado)){
+            if(!empty($cuentaLetras)){
                 ?>
                 <div class="col-12">
                     <div class="alert alert-success">
-                       <?php foreach ($resultados as $resultado){
-                          echo $resultado;
+                       <?php foreach ($cuentaLetras as $key => $conteo){
+                          echo $key . ' => ' . $conteo . '<br>';
                        }?>
                     </div>
                 </div>
-                    <?php
+                <?php
+            }else{
+                ?>
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        Error : algo a salido mal , vuelvelo a intentar mas tarde.
+                    </div>
+                </div>
+            <?php
             }
-            ?>
+                ?>
         </div>
     </div>
