@@ -281,24 +281,33 @@ class EjerciciosController extends BaseController
 
 
 
-    public function notasTrimestresAlumnos()
+    public function calculoNotas()
     {
         $data = array(
-            'titulo' => 'Notas Trimestres',
-            'breadcrumb' => ['Inicio', 'Notas Trimestres']
+            'titulo' => 'Calculo Notas',
+            'breadcrumb' => ['Inicio', 'Calculo Notas']
         );
 
         $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
     }
 
 
-    public function doNotasTrimestresAlumnos(){
+    public function doCalculoNotas(){
         $data = array(
-            'titulo' => 'Notas Trimestres',
-            'breadcrumb' => ['Inicio', 'Notas Trimestres']
+            'titulo' => 'Calculo Notas',
+            'breadcrumb' => ['Inicio', 'Calculo Notas']
         );
-
-        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data)
+        $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $data['datosRecibidos'] = $_POST['notas'];
+        if(isset($data['datosRecibidos'])){
+            $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
+            if($this->checkErrorsCalculoNotas($data['datosJson'])){
+                $data['validado'] = 'Succesfull: El Json a sido validado';
+            }else{
+                $data['error'] = 'Error: El texto introducido debe esta en formato Json, y este debe tener la nota de los tres trimestres.';
+            }
+        }
+        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
     }
 
 
@@ -397,19 +406,29 @@ class EjerciciosController extends BaseController
         if ($this->validarJson($data) == true) {
             $datosJson = $this->transformJson($data);
             if ($datosJson) {
-                foreach ($datosJson as $dato) {
-                    foreach ($dato as $alumno => $nota) {
-                        if (!$this->validateString($alumno) || !$this->validateInt($nota)) {
-                            return [];
-                        }
-                    }
-                }
                 return $datosJson;
             }
         }
         return [];
     }
 
+    //Hacer checkErrorsNotasAlumnos
+
+    private function checkErrorsCalculoNotas(array $data) : bool
+    {
+       foreach ($data as $asignatura){
+           foreach ($asignatura as $alumno => $notas){
+               foreach ($notas as $nota){
+                   if(is_array($asignatura)){
+                       if(!$this->validateString($alumno) || !is_array($notas) || $notas === []){
+                         return false;
+                       }
+                   }
+               }
+           }
+       }
+       return true;
+    }
 
     /**
      * @param $data
@@ -449,6 +468,16 @@ class EjerciciosController extends BaseController
     {
         if(isset($string) && trim($string) !== '') {
             return true;
+        }
+        return false;
+    }
+
+    private function validateFloat($float) : bool
+    {
+        if(isset($float) && is_float($float)) {
+            if($float >= 0 && $float <= 10) {
+                return true;
+            }
         }
         return false;
     }

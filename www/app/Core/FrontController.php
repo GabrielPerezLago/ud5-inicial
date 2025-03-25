@@ -135,6 +135,29 @@ class FrontController
             'post'
         );
 
+        /**
+         * @CalculoNotas
+         *
+         * Estas son las rutas del ejercicio de calculo de notas
+         */
+
+        Route::add(
+            '/calculoNotas',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->calculoNotas();
+            },
+            'get'
+        );
+
+        Route::add(
+            '/calculoNotas',
+            function (){
+                $controller = new EjerciciosController();
+                $controller->doCalculoNotas();
+            },
+            'post'
+        );
 
         /**
          * @ControladoresDefault
