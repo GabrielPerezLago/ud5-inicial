@@ -275,8 +275,32 @@ class EjerciciosController extends BaseController
                 $data['error'] = 'Error: El texto introducido debe esta en formato Json.';
             }
         }
-        $this->view->showViews(array('templates/header.view.php', 'notasALumnos.view.php', 'templates/footer.view.php'), $data);
+        $this->view->showViews(array('templates/header.view.php', 'notasAlumnos.view.php', 'templates/footer.view.php'), $data);
     }
+
+
+
+
+    public function notasTrimestresAlumnos()
+    {
+        $data = array(
+            'titulo' => 'Notas Trimestres',
+            'breadcrumb' => ['Inicio', 'Notas Trimestres']
+        );
+
+        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
+    }
+
+
+    public function doNotasTrimestresAlumnos(){
+        $data = array(
+            'titulo' => 'Notas Trimestres',
+            'breadcrumb' => ['Inicio', 'Notas Trimestres']
+        );
+
+        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data)
+    }
+
 
     /**
      * @param array $data
@@ -350,7 +374,6 @@ class EjerciciosController extends BaseController
             ];
         }
 
-
         return $resultados;
 
     }
@@ -364,13 +387,23 @@ class EjerciciosController extends BaseController
      *
      * Esta funcion se encarga de usando las otras funcines de validacion y transformacion del json,
      * validar si el texto pasado esta en formato json y si es el caso este convertirlo en un array.
+     *
+     * Y valida si los alumnos son un String y si las notas son de tipo int
      */
 
     private function validateJsonAndTransformToArray($data) : array
     {
+
         if ($this->validarJson($data) == true) {
             $datosJson = $this->transformJson($data);
             if ($datosJson) {
+                foreach ($datosJson as $dato) {
+                    foreach ($dato as $alumno => $nota) {
+                        if (!$this->validateString($alumno) || !$this->validateInt($nota)) {
+                            return [];
+                        }
+                    }
+                }
                 return $datosJson;
             }
         }
@@ -403,5 +436,37 @@ class EjerciciosController extends BaseController
     private function transformJson($data) : array
     {
        return json_decode($data, true);
+    }
+
+
+    /**
+     * @param $string
+     * @return bool
+     *
+     * Valida Strings
+     */
+    private function validateString($string) : bool
+    {
+        if(isset($string) && trim($string) !== '') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $int
+     * @return bool
+     *
+     * valida numeros tipo int
+     */
+    private function validateInt($int) : bool
+    {
+
+        if (isset($int) && is_int($int)) {
+            if($int >= 0 && $int <= 10) {
+                return true;
+            }
+        }
+        return false;
     }
 }
