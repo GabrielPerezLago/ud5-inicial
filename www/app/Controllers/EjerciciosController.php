@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Com\Daw2\Controllers;
 
 use Cassandra\Map;
@@ -16,7 +18,8 @@ class EjerciciosController extends BaseController
      *
      */
 
-    public function ejercicioUno() {
+    public function ejercicioUno()
+    {
         $data = array(
             'titulo' => 'Ejercicio 1',
             'breadcrumb' => ['Inicio', 'Ejercicio 1']
@@ -49,8 +52,8 @@ class EjerciciosController extends BaseController
         );
 
         if (empty($_POST['numeroUno']) || empty($_POST['numeroDos'])) {
-           $data['resultado'] = 'Inserte los dos numeros porfavor';
-        }else {
+            $data['resultado'] = 'Inserte los dos numeros porfavor';
+        } else {
             if (filter_var($data['numeroDos'], FILTER_VALIDATE_FLOAT) && filter_var($data['numeroDos'], FILTER_VALIDATE_FLOAT)) {
                 $data['resultado'] = $data['numeroUno'] * $data['numeroDos'];
             } else {
@@ -78,11 +81,10 @@ class EjerciciosController extends BaseController
 
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $data['errors'] = $this->checkErrorsEjerecicioTres($_POST);
-        if(empty($data['errors'])) {
+        if (empty($data['errors'])) {
             $data['resultado'] = max($_POST['numeroUno'], $_POST['numeroDos'], $_POST['numeroTres']);
         }
         $this->view->showViews(array('templates/header.view.php', 'ejercicioTres.view.php', 'templates/footer.view.php'), $data);
-
     }
 
 
@@ -113,7 +115,7 @@ class EjerciciosController extends BaseController
      * $errors['numeroTres']= 'El valor introducido debe de ser un numero';
      * }
      */
-    private function checkErrorsEjerecicioTres(array $data) : array
+    private function checkErrorsEjerecicioTres(array $data): array
     {
         $errors = [];
         // Pronbar con hacer un array con los tres datas **Numeros para que no recorra el resto del array data que tiene texto.8
@@ -148,14 +150,14 @@ class EjerciciosController extends BaseController
      * Esta funcion solo se usa para inciar la ruta.
      *
      */
-    public function ejercicioCuatro(){
+    public function ejercicioCuatro()
+    {
         $data = array(
             'titulo' => 'Ejercicio 4',
             'breadcrumb' => ['Inicio', 'Ejercicio 4']
         );
 
         $this->view->showViews(array('templates/header.view.php', 'ejercicioCuatro.view.php', 'templates/footer.view.php'), $data);
-
     }
 
     /**
@@ -179,7 +181,7 @@ class EjerciciosController extends BaseController
         );
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $data['errors'] = $this->checkErrorsEjercicioCuatro($_POST);
-        if($data['errors'] === []){
+        if ($data['errors'] === []) {
             // Limpiar el codigo , reducir la cantidad de este y hacerlo mas legible.
 
 
@@ -189,7 +191,6 @@ class EjerciciosController extends BaseController
             arsort($data['cuentaLetras']);
         }
         $this->view->showViews(array('templates/header.view.php', 'ejercicioCuatro.view.php', 'templates/footer.view.php'), $data);
-
     }
 
     /**
@@ -203,11 +204,11 @@ class EjerciciosController extends BaseController
      *
      */
 
-    private function checkErrorsEjercicioCuatro(array $data) : array
+    private function checkErrorsEjercicioCuatro(array $data): array
     {
         $errors = [];
 
-        if(!preg_match('/^[\p{L} ]+$/u', $data['texto'])) {
+        if (!preg_match('/^[\p{L} ]+$/u', $data['texto'])) {
             $errors['texto'] = 'El texto no puede contener numeros ni caracteres especiales, inserte solo textos porfavor.';
         }
 
@@ -254,23 +255,20 @@ class EjerciciosController extends BaseController
         );
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $data['datosRecibidos'] = $_POST['notas'];
-        if(isset($data['datosRecibidos'])) {
+        if (isset($data['datosRecibidos'])) {
             /**
              * La variable $datosJson es la que se encarga de almacenar el json validado y transformado en array
              */
             $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
-            if($data['datosJson'] && is_array($data['datosJson'])) {
+            if ($data['datosJson'] && is_array($data['datosJson'])) {
                 /**
                  * Estas dos variables son las que se encargan de almacenar todos los datos.
                  * Siendo que $_datos almacena el JSON puro y $_resultados almacena los datos de las medias etc...
                  *
                  */
 
-                $data['_resultados'] = $this->manejoCalculoNotas($data['datosJson']);
+                $data['_resultados'] = $this->manejoNotasAlumnos($data['datosJson']);
                 $data['_datos'] = $data['datosJson'];
-
-
-
             } else {
                 $data['error'] = 'Error: El texto introducido debe esta en formato Json.';
             }
@@ -292,18 +290,20 @@ class EjerciciosController extends BaseController
     }
 
 
-    public function doCalculoNotas(){
+    public function doCalculoNotas()
+    {
         $data = array(
             'titulo' => 'Calculo Notas',
             'breadcrumb' => ['Inicio', 'Calculo Notas']
         );
         $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $data['datosRecibidos'] = $_POST['notas'];
-        if(isset($data['datosRecibidos'])){
+        if (isset($data['datosRecibidos'])) {
             $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
-            if($this->checkErrorsCalculoNotas($data['datosJson'])){
-                $data['validado'] = 'Succesfull: El Json a sido validado';
-            }else{
+            if ($this->checkErrorsCalculoNotas($data['datosJson'])) {
+                $data['_resultados'] = $this->manejoCalculoNotas($data['datosJson']);
+                $data['_datos'] = $data['datosJson'];
+            } else {
                 $data['error'] = 'Error: El texto introducido debe esta en formato Json, y este debe tener la nota de los tres trimestres.';
             }
         }
@@ -319,7 +319,7 @@ class EjerciciosController extends BaseController
      * Esta funcion es la que se encarga de realizar las operaciones sobre el json que se le pase como parametro
      *
      */
-    private function manejoCalculoNotas(array $data) : array
+    private function manejoNotasAlumnos(array $data): array
     {
         $medias  = [];
         $aprobados  = [];
@@ -331,7 +331,7 @@ class EjerciciosController extends BaseController
             // de la nota minima , maxima , las medias y los aprobados/suspensos de cada asignatura.
         $resultados = [];
 
-        foreach ($data as $asignaturas => $notas){
+        foreach ($data as $asignaturas => $notas) {
 
             /**  Nostas Medias */
             // Calcula las medias de las notas de cada asignatura.
@@ -340,10 +340,10 @@ class EjerciciosController extends BaseController
 
             /** Aprobados y Suspensos */
             // Calcula la cantidad de aprobados y suspensos de cada asignatura.
-            $alumnosAprobados =[];
+            $alumnosAprobados = [];
             $alumnosSuspensos = [];
-            foreach($notas as $nota){
-                if ($nota >= 5){
+            foreach ($notas as $nota) {
+                if ($nota >= 5) {
                     $alumnosAprobados[] = $nota;
                 } else {
                     $alumnosSuspensos[] = $nota;
@@ -351,7 +351,6 @@ class EjerciciosController extends BaseController
                 // Guarda las el número de suspensos y aprobados de cada asignartura
                 $aprobados = count($alumnosAprobados);
                 $suspensos = count($alumnosSuspensos);
-
             }
 
             /** Notas minimas y maximas */
@@ -384,7 +383,64 @@ class EjerciciosController extends BaseController
         }
 
         return $resultados;
+    }
 
+
+    private function manejoCalculoNotas(array $data) : array {
+        $medias = [];
+        $aprobados  = [];
+        $suspensos = [];
+        $notaMax = [];
+        $notaMin = [];
+
+        $resultados = [];
+        foreach ($data as $asignatura => $alumnos) {
+            foreach ($alumnos as $alumno => $notas) {
+                foreach ($notas as $nota) {
+                    $media = $this->doMedia($notas);
+                    $medias = $media;
+
+                    $alumnosAprobados = [];
+                    $alumnosSuspensos = [];
+                    if ($media >= 5) {
+                        $alumnosAprobados[] = $alumno;
+
+                    }else {
+                        $alumnosSuspensos[] = $alumno;
+                    }
+
+                    $aprobados = count($alumnosAprobados);
+                    $suspensos = count($alumnosSuspensos);
+
+
+                    $max = max($notas);
+                    $min = min($notas);
+
+
+                    $alumnoNotaMax = array_search($max, $notas);
+                    $alumnoNotaMin = array_search($min, $notas);
+
+                    $notaMax = [
+                        'alumno' => $alumnoNotaMax,
+                        'nota' => $max
+                    ];
+
+                    $notaMin = [
+                        'alumno' => $alumnoNotaMin,
+                        'nota' => $min
+                    ];
+                }
+            }
+
+            $resultados[$asignatura] = [
+                'media' => $medias,
+                'aprobados' => $aprobados,
+                'suspensos' => $suspensos,
+                'nota maxima' => $notaMax,
+                'nota minima' => $notaMin
+            ];
+        }
+        return $resultados;
     }
 
 
@@ -400,7 +456,7 @@ class EjerciciosController extends BaseController
      * Y valida si los alumnos son un String y si las notas son de tipo int
      */
 
-    private function validateJsonAndTransformToArray($data) : array
+    private function validateJsonAndTransformToArray($data): array
     {
 
         if ($this->validarJson($data) == true) {
@@ -414,20 +470,20 @@ class EjerciciosController extends BaseController
 
     //Hacer checkErrorsNotasAlumnos
 
-    private function checkErrorsCalculoNotas(array $data) : bool
+    private function checkErrorsCalculoNotas(array $data): bool
     {
-       foreach ($data as $asignatura){
-           foreach ($asignatura as $alumno => $notas){
-               foreach ($notas as $nota){
-                   if(is_array($asignatura)){
-                       if(!$this->validateString($alumno) || !is_array($notas) || $notas === []){
-                         return false;
-                       }
-                   }
-               }
-           }
-       }
-       return true;
+        foreach ($data as $asignatura) {
+            foreach ($asignatura as $alumno => $notas) {
+                foreach ($notas as $nota) {
+                    if (is_array($asignatura)) {
+                        if (!$this->validateString($alumno) || !is_array($notas) || $notas === []) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -438,7 +494,7 @@ class EjerciciosController extends BaseController
      *
      */
 
-    private function validarJson($data) : bool
+    private function validarJson($data): bool
     {
         json_decode($data);
         return json_last_error() === JSON_ERROR_NONE;
@@ -452,9 +508,9 @@ class EjerciciosController extends BaseController
      * Esta funcion transforma un texto en formato Json en un array
      *
      */
-    private function transformJson($data) : array
+    private function transformJson($data): array
     {
-       return json_decode($data, true);
+        return json_decode($data, true);
     }
 
 
@@ -464,18 +520,18 @@ class EjerciciosController extends BaseController
      *
      * Valida Strings
      */
-    private function validateString($string) : bool
+    private function validateString($string): bool
     {
-        if(isset($string) && trim($string) !== '') {
+        if (isset($string) && trim($string) !== '') {
             return true;
         }
         return false;
     }
 
-    private function validateFloat($float) : bool
+    private function validateFloat($float): bool
     {
-        if(isset($float) && is_float($float)) {
-            if($float >= 0 && $float <= 10) {
+        if (isset($float) && is_float($float)) {
+            if ($float >= 0 && $float <= 10) {
                 return true;
             }
         }
@@ -488,14 +544,19 @@ class EjerciciosController extends BaseController
      *
      * valida numeros tipo int
      */
-    private function validateInt($int) : bool
+    private function validateInt($int): bool
     {
 
         if (isset($int) && is_int($int)) {
-            if($int >= 0 && $int <= 10) {
+            if ($int >= 0 && $int <= 10) {
                 return true;
             }
         }
         return false;
+    }
+
+    private function doMedia(array $array) : float {
+        $media = array_sum($array) / count($array);
+        return (float) number_format($media, 2);
     }
 }

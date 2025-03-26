@@ -32,7 +32,7 @@
                 ?>
             <div class="container">
                 <div class="row col-12">
-                    <p class="alert-success"> <?php echo $validado ?> </p>
+                    <p class="text-success"> <?php echo $_resultados ?> </p>
                 </div>
             </div>
             <?php
