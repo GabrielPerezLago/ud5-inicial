@@ -473,7 +473,7 @@ class EjerciciosController extends BaseController
     private function checkErrorsCalculoNotas(array $data): bool
     {
         foreach ($data as $asignatura => $alumnos) {
-            if (!$this->validateString($asignatura)) {
+            if (!is_array($alumnos) || !$this->validateString($asignatura)) {
                 return false;
             }
             foreach ($alumnos as $alumno => $notas) {
@@ -536,7 +536,7 @@ class EjerciciosController extends BaseController
         return false;
     }
 
-    public function validateFloat(float $float) : bool
+    public function validateFloat($float) : bool
     {
         if(isset($float) && is_numeric($float)) {
             if(filter_var($float, FILTER_VALIDATE_FLOAT)) {
