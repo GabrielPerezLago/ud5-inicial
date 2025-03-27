@@ -187,7 +187,7 @@ class EjerciciosController extends BaseController
 
             $data['textoLimpio'] = str_replace(' ', '', $_POST['texto']);
             $data['letras'] = str_split($data['textoLimpio']);
-            $data['cuentaLetras'] = array_count_values($data['letras']);
+//            $data['cuentaLetras'] = array_count_values($data['letras']);
             arsort($data['cuentaLetras']);
         }
         $this->view->showViews(array('templates/header.view.php', 'ejercicioCuatro.view.php', 'templates/footer.view.php'), $data);
@@ -302,7 +302,7 @@ class EjerciciosController extends BaseController
             $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
             if ($this->checkErrorsCalculoNotas($data['datosJson'])) {
                 $data['_resultados'] = $this->manejoCalculoNotas($data['datosJson']);
-                $data['_datos'] = $data['datosJson'];
+
             } else {
                 $data['error'] = 'Error: El texto introducido debe esta en formato Json, y este debe tener la nota de los tres trimestres.';
             }
@@ -387,58 +387,62 @@ class EjerciciosController extends BaseController
 
 
     private function manejoCalculoNotas(array $data) : array {
+        $resultados = []; //Variable que guarda los datos
+
         $medias = [];
-        $aprobados  = [];
+        $aprobados = [];
         $suspensos = [];
-        $notaMax = [];
-        $notaMin = [];
+        $maxNotas = [];
+        $minNotas = [];
 
-        $resultados = [];
-        foreach ($data as $asignatura => $alumnos) {
-            foreach ($alumnos as $alumno => $notas) {
-                foreach ($notas as $nota) {
-                    $media = $this->doMedia($notas);
-                    $medias = $media;
-
-                    $alumnosAprobados = [];
-                    $alumnosSuspensos = [];
-                    if ($media >= 5) {
-                        $alumnosAprobados[] = $alumno;
-
-                    }else {
-                        $alumnosSuspensos[] = $alumno;
-                    }
-
-                    $aprobados = count($alumnosAprobados);
-                    $suspensos = count($alumnosSuspensos);
+        $alumnoAprobado = [];
+        $alumnoSuspenso = [];
+        foreach($data as $asignatura => $alumnos){
+            foreach ($alumnos as $alumno => $notas){
+                $media = $this->doMedia($notas);
+                $mediaForALumnoArr = [
+                    $alumno,
+                    $media
+                ];
+                $mediasAlumnos = $this->doMedia($mediaForALumnoArr);
+                $medias = $mediasAlumnos;
 
 
-                    $max = max($notas);
-                    $min = min($notas);
 
 
-                    $alumnoNotaMax = array_search($max, $notas);
-                    $alumnoNotaMin = array_search($min, $notas);
 
-                    $notaMax = [
-                        'alumno' => $alumnoNotaMax,
-                        'nota' => $max
-                    ];
-
-                    $notaMin = [
-                        'alumno' => $alumnoNotaMin,
-                        'nota' => $min
-                    ];
+                if($media >= 5){
+                    $alumnoAprobado[] = $alumno;
+                }else{
+                    $alumnoSuspenso[] = $alumno;
                 }
+
+                $aprobados = count($alumnoAprobado);
+                $suspensos = count($alumnoSuspenso);
+                $max = max($notas);
+                $min = min($notas);
+
+                $alumnoNotaMax = array_search($max, $notas);
+                $alumnoNotaMin = array_search($min, $notas);
+
+                $maxNotas = [
+                    'alumno' => $alumnoNotaMax,
+                    'nota' => $max
+                ];
+
+                $minNotas = [
+                    'alumno' => $alumnoNotaMin,
+                    'nota' => $min
+                ];
             }
 
             $resultados[$asignatura] = [
                 'media' => $medias,
                 'aprobados' => $aprobados,
                 'suspensos' => $suspensos,
-                'nota maxima' => $notaMax,
-                'nota minima' => $notaMin
-            ];
+                'nota maxima' => $maxNotas,
+                'nota minima' => $minNotas
+                ];
         }
         return $resultados;
     }
