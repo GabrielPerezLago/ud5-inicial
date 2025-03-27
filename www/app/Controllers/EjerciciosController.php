@@ -472,16 +472,24 @@ class EjerciciosController extends BaseController
 
     private function checkErrorsCalculoNotas(array $data): bool
     {
-        foreach ($data as $asignatura) {
-            foreach ($asignatura as $alumno => $notas) {
+        foreach ($data as $asignatura => $alumnos) {
+            if (!$this->validateString($asignatura)) {
+                return false;
+            }
+            foreach ($alumnos as $alumno => $notas) {
+                if (!$this->validateString($alumno)) {
+                    return false;
+                }
                 foreach ($notas as $nota) {
-                    if (is_array($asignatura)) {
-                        if (!$this->validateString($alumno) || !is_array($notas) || $notas === []) {
-                            return false;
-                        }
+                    if(!is_array($notas) || $notas === []) {
+                        return false;
+                    }
+                    if (!$this->validateFloat($nota)) {
+                        return false;
                     }
                 }
             }
+
         }
         return true;
     }
@@ -528,11 +536,13 @@ class EjerciciosController extends BaseController
         return false;
     }
 
-    private function validateFloat($float): bool
+    public function validateFloat(float $float) : bool
     {
-        if (isset($float) && is_float($float)) {
-            if ($float >= 0 && $float <= 10) {
-                return true;
+        if(isset($float) && is_numeric($float)) {
+            if(filter_var($float, FILTER_VALIDATE_FLOAT)) {
+                if($float >= 0 && $float <= 10) {
+                    return true;
+                }
             }
         }
         return false;
