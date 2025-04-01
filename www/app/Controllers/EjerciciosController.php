@@ -379,12 +379,13 @@ class EjerciciosController extends BaseController
      * Esta funcion valida que el parametro recibido este en formato json
      *
      */
-
     private function validarJson($data): bool
     {
         json_decode($data);
         return json_last_error() === JSON_ERROR_NONE;
     }
+
+
 
     /**
      * @param $data
@@ -479,28 +480,31 @@ class EjerciciosController extends BaseController
 
         $errors = [];
         foreach($data as $asignatura => $alumnos){
-            if(!is_array($alumnos) || !$this->validateString($asignatura)){
-                $errors['asignatura'] = "Error: La asignatura no puede estar vacia y debe de ser un campo de texto.";
+            if(filter_var($asignatura, FILTER_VALIDATE_FLOAT) || !$this->validateString($asignatura)){
+                $errors['asignatura'][$asignatura] = "Error: La asignatura " . $asignatura . " no puede estar vacia y debe de ser un campo de texto.";
             }
             $aprobados = 0;
             $suspensos = 0;
             $mediaForAlumnoArr = [];
             foreach ($alumnos as $alumno => $notas) {
                 if (!$this->validateString($alumno)) {
-                    $errors['alumno'] = "Error: El nombre del alumno no puede estar vacío y debe de ser un campo de texto.";
+                    $errors['alumno'][$alumno] = "Error: El alumno " . $alumno . " no puede estar vacio y debe de ser un campo de texto.";
                 }
                 if (!is_array($notas) || $notas === []) {
-                    $errors['notas'] = "Error: Las notas no pueden estar vacias.";
-                }
-                if (!$this->captureNotasErrors($notas)) {
-                    $errors['nota'] = "Error: Las notas no pueden estar vacias y deben de ser numeros , y no puden ser ni mas ni menos de 3.";
+                    $errors['notas'][$alumno] = "Error: las notas del alumno " . $alumno . " no pueden estar vacias.";
                 }
 
-                //Medias de cada Asignartura
-                $media = $this->doMedia($notas);
-                $mediaForAlumnoArr[$alumno] = $media;
-                $mediasAlumnos = $this->doMedia($mediaForAlumnoArr);
-                $medias = $mediasAlumnos;
+
+                if(is_array($notas) && !empty($notas) || !$notas === [] ) {
+                    //Medias de cada Asignartura
+                    $media = $this->doMedia($notas);
+                    $mediaForAlumnoArr[$alumno] = $media;
+                    $mediasAlumnos = $this->doMedia($mediaForAlumnoArr);
+                    $medias = $mediasAlumnos;
+                }else {
+                    $media = null;
+                }
+
 
                 if (empty($medias) || $medias === []) {
                 $errors['media'] = "Error: Ha ocurrido un error al realizar el calculo de la media de la asignatura.";
@@ -519,11 +523,9 @@ class EjerciciosController extends BaseController
                     $errors['suspensos'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos suspensos";
                 }
 
-
-
                 //Notas minimas y maximas;
-                $max = max($mediaForAlumnoArr);
-                $min = min($mediaForAlumnoArr);
+                $max = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr ===  [] ? max($mediaForAlumnoArr) : null;
+                $min = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr ===  []  ? min($mediaForAlumnoArr) : null;
 
                 if(!$max || $max === null || !$this->validateFloat($max)){
                     $errors['maxNotas'] = "Error: Ha ocurrido un error en la busqueda de la nota maxima de la asignatura.";
@@ -618,7 +620,7 @@ class EjerciciosController extends BaseController
 
     private function captureNotasErrors(array $notas) : bool{
         foreach ($notas as $nota){
-            if(!$this->validateFloat($nota) || $nota === null || count($notas) > 3  || count($notas) < 3){
+            if(!$this->validateFloat($nota)){
                 return false;
             }
         }

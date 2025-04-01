@@ -34,8 +34,13 @@
                         <div class="row col-12">
                             <div class="alert alert-danger col-lg-12">
                                 <?php
-                                foreach ($errors as $error) {
-                                    echo $error . '<br>';
+                                foreach ($errors as $key => $error) {
+                                    if (is_array($error)) {
+                                        foreach ($error as $valor) {
+                                            echo $valor . '<br>';
+                                        }
+                                    }
+
                                 }
                                 ?>
                             </div>
