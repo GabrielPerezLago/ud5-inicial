@@ -225,7 +225,6 @@ class EjerciciosController extends BaseController
      * Esta es la funcion que se encarga de la vista del ejercicio
      *
      */
-
     public function notasAlumnos()
     {
         $data = array(
@@ -245,8 +244,6 @@ class EjerciciosController extends BaseController
      * lo que vamos a realizar en este ejercicio
      *
      */
-
-
     public function doNotasAulumnos()
     {
         $data = array(
@@ -275,41 +272,6 @@ class EjerciciosController extends BaseController
         }
         $this->view->showViews(array('templates/header.view.php', 'notasAlumnos.view.php', 'templates/footer.view.php'), $data);
     }
-
-
-
-
-    public function calculoNotas()
-    {
-        $data = array(
-            'titulo' => 'Calculo Notas',
-            'breadcrumb' => ['Inicio', 'Calculo Notas']
-        );
-
-        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
-    }
-
-
-    public function doCalculoNotas()
-    {
-        $data = array(
-            'titulo' => 'Calculo Notas',
-            'breadcrumb' => ['Inicio', 'Calculo Notas']
-        );
-        $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $data['datosRecibidos'] = $_POST['notas'];
-        if (isset($data['datosRecibidos'])) {
-            $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
-            if ($this->checkErrorsCalculoNotas($data['datosJson'])) {
-                $data['_resultados'] = $this->manejoCalculoNotas($data['datosJson']);
-
-            } else {
-                $data['error'] = 'Error: El texto introducido debe esta en formato Json, y este debe tener la nota de los tres trimestres.';
-            }
-        }
-        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
-    }
-
 
     /**
      * @param array $data
@@ -385,69 +347,6 @@ class EjerciciosController extends BaseController
         return $resultados;
     }
 
-
-    private function manejoCalculoNotas(array $data) : array {
-        $resultados = []; //Variable que guarda los datos
-
-        $medias = [];
-        $aprobados = [];
-        $suspensos = [];
-        $maxNotas = [];
-        $minNotas = [];
-
-        $alumnoAprobado = [];
-        $alumnoSuspenso = [];
-        foreach($data as $asignatura => $alumnos){
-            foreach ($alumnos as $alumno => $notas){
-                $media = $this->doMedia($notas);
-                $mediaForALumnoArr = [
-                    $alumno,
-                    $media
-                ];
-                $mediasAlumnos = $this->doMedia($mediaForALumnoArr);
-                $medias = $mediasAlumnos;
-
-
-
-
-
-                if($media >= 5){
-                    $alumnoAprobado[] = $alumno;
-                }else{
-                    $alumnoSuspenso[] = $alumno;
-                }
-
-                $aprobados = count($alumnoAprobado);
-                $suspensos = count($alumnoSuspenso);
-                $max = max($notas);
-                $min = min($notas);
-
-                $alumnoNotaMax = array_search($max, $notas);
-                $alumnoNotaMin = array_search($min, $notas);
-
-                $maxNotas = [
-                    'alumno' => $alumnoNotaMax,
-                    'nota' => $max
-                ];
-
-                $minNotas = [
-                    'alumno' => $alumnoNotaMin,
-                    'nota' => $min
-                ];
-            }
-
-            $resultados[$asignatura] = [
-                'media' => $medias,
-                'aprobados' => $aprobados,
-                'suspensos' => $suspensos,
-                'nota maxima' => $maxNotas,
-                'nota minima' => $minNotas
-                ];
-        }
-        return $resultados;
-    }
-
-
     /**
      * @param $data
      * @return array
@@ -459,7 +358,6 @@ class EjerciciosController extends BaseController
      *
      * Y valida si los alumnos son un String y si las notas son de tipo int
      */
-
     private function validateJsonAndTransformToArray($data): array
     {
 
@@ -472,31 +370,7 @@ class EjerciciosController extends BaseController
         return [];
     }
 
-    //Hacer checkErrorsNotasAlumnos
-
-    private function checkErrorsCalculoNotas(array $data): bool
-    {
-        foreach ($data as $asignatura => $alumnos) {
-            if (!is_array($alumnos) || !$this->validateString($asignatura)) {
-                return false;
-            }
-            foreach ($alumnos as $alumno => $notas) {
-                if (!$this->validateString($alumno)) {
-                    return false;
-                }
-                foreach ($notas as $nota) {
-                    if(!is_array($notas) || $notas === []) {
-                        return false;
-                    }
-                    if (!$this->validateFloat($nota)) {
-                        return false;
-                    }
-                }
-            }
-
-        }
-        return true;
-    }
+    /********** Hacer checkErrorsNotasAlumnos *******/
 
     /**
      * @param $data
@@ -540,18 +414,6 @@ class EjerciciosController extends BaseController
         return false;
     }
 
-    public function validateFloat($float) : bool
-    {
-        if(isset($float) && is_numeric($float)) {
-            if(filter_var($float, FILTER_VALIDATE_FLOAT)) {
-                if($float >= 0 && $float <= 10) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     /**
      * @param $int
      * @return bool
@@ -569,8 +431,197 @@ class EjerciciosController extends BaseController
         return false;
     }
 
+
+
+
+    /* * * * * * * * * * * * * * * * * CALCULO NOTAS * * * * * * * * * * * * * * * * * * * * */
+
+
+    public function calculoNotas()
+    {
+        $data = array(
+            'titulo' => 'Calculo Notas',
+            'breadcrumb' => ['Inicio', 'Calculo Notas']
+        );
+
+        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
+    }
+
+    public function doCalculoNotas()
+    {
+        $data = array(
+            'titulo' => 'Calculo Notas',
+            'breadcrumb' => ['Inicio', 'Calculo Notas']
+        );
+        $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        $data['datosRecibidos'] = $_POST['notas']  ?? '';
+        if (isset($data['datosRecibidos'])) {
+            $data['datosJson'] = $this->validateJsonAndTransformToArray($data['datosRecibidos']);
+                $results = $this->manejoCalculoNotas($data['datosJson']);
+                if (isset($results['errores']) && $results['errores'] !== [] ) {
+                    $data['errors'] = $results['errores'];
+                } else {
+                    $data['_resultados'] = $results['resultados'];
+                }
+            } else {
+                $data['error'] = 'Error: El texto introducido debe esta en formato Json, y este debe tener la nota de los tres trimestres.';
+            }
+
+        $this->view->showViews(array('templates/header.view.php', 'calculoNotas.view.php', 'templates/footer.view.php'), $data);
+    }
+
+    private function manejoCalculoNotas(array $data) : array {
+        $resultados = []; //Variable que guarda los datos
+        $medias = [];
+        $maxNotas = [];
+        $minNotas = [];
+
+        $errors = [];
+        foreach($data as $asignatura => $alumnos){
+            if(!is_array($alumnos) || !$this->validateString($asignatura)){
+                $errors['asignatura'] = "Error: La asignatura no puede estar vacia y debe de ser un campo de texto.";
+            }
+            $aprobados = 0;
+            $suspensos = 0;
+            $mediaForAlumnoArr = [];
+            foreach ($alumnos as $alumno => $notas) {
+                if (!$this->validateString($alumno)) {
+                    $errors['alumno'] = "Error: El nombre del alumno no puede estar vacío y debe de ser un campo de texto.";
+                }
+                if (!is_array($notas) || $notas === []) {
+                    $errors['notas'] = "Error: Las notas no pueden estar vacias.";
+                }
+                if (!$this->captureNotasErrors($notas)) {
+                    $errors['nota'] = "Error: Las notas no pueden estar vacias y deben de ser numeros , y no puden ser ni mas ni menos de 3.";
+                }
+
+                //Medias de cada Asignartura
+                $media = $this->doMedia($notas);
+                $mediaForAlumnoArr[$alumno] = $media;
+                $mediasAlumnos = $this->doMedia($mediaForAlumnoArr);
+                $medias = $mediasAlumnos;
+
+                if (empty($medias) || $medias === []) {
+                $errors['media'] = "Error: Ha ocurrido un error al realizar el calculo de la media de la asignatura.";
+                }
+
+                // Numero de aprobados y suspensos;
+                if ($media >= 5) {
+                    $aprobados++;
+                } else {
+                    $suspensos++;
+                }
+
+                if(!isset($aprobados) || $aprobados === null){
+                    $errors['aprobados'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos aprobados";
+                } else if (isset($suspensos) && $suspensos === null) {
+                    $errors['suspensos'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos suspensos";
+                }
+
+
+
+                //Notas minimas y maximas;
+                $max = max($mediaForAlumnoArr);
+                $min = min($mediaForAlumnoArr);
+
+                if(!$max || $max === null || !$this->validateFloat($max)){
+                    $errors['maxNotas'] = "Error: Ha ocurrido un error en la busqueda de la nota maxima de la asignatura.";
+                }
+
+                if(!$min || $min === null || !$this->validateFloat($min))  {
+                    $errors['minNotas'] = "Error: Ha ocurrido un error en la busqueda de la nota minima de la asignatura.";
+                }
+
+                $alumnoNotaMax = array_search($max, $mediaForAlumnoArr);
+                $alumnoNotaMin = array_search($min, $mediaForAlumnoArr);
+
+                if(!$alumnoNotaMax || $alumnoNotaMax === null || !$this->validateString($alumnoNotaMax)){
+                    $errors['alumnoNotaMax'] = "Error: Ha ocurrido un error en la busqueda del alumno con la nota maxima de la asignatura.";
+                }
+
+                if (!$alumnoNotaMin || $alumnoNotaMin === null || !$this->validateString($alumnoNotaMin)){
+                    $errors['alumnosNotaMin'] = "Error: Ha ocurrido un error en la busqueda del alumno con la nota minima de la asignatura.";
+                }
+
+
+
+                $maxNotas = [
+                    'alumno' => $alumnoNotaMax,
+                    'nota' => $max
+                ];
+
+                $minNotas = [
+                    'alumno' => $alumnoNotaMin,
+                    'nota' => $min
+                ];
+            }
+
+
+            if($errors === []) {
+                $resultados[$asignatura] = [
+                    'media' => $medias,
+                    'aprobados' => $aprobados,
+                    'suspensos' => $suspensos,
+                    'nota maxima' => $maxNotas,
+                    'nota minima' => $minNotas
+                ];
+            }
+        }
+        if(!empty($errors) || !$errors === []){
+            return ['errores' => $errors];
+        }else{
+            return ['resultados' => $resultados];
+        }
+    }
+
+    private function checkErrorsCalculoNotas(array $data): bool
+    {
+        foreach ($data as $asignatura => $alumnos) {
+            if (!is_array($alumnos) || !$this->validateString($asignatura)) {
+                return false;
+            }
+            foreach ($alumnos as $alumno => $notas) {
+                if (!$this->validateString($alumno)) {
+                    return false;
+                }
+                foreach ($notas as $nota) {
+                    if(!is_array($notas) || $notas === []) {
+                        return false;
+                    }
+                    if (!$this->validateFloat($nota)) {
+                        return false;
+                    }
+                }
+            }
+
+        }
+        return true;
+    }
+
+    private function validateFloat($float) : bool
+    {
+        if(isset($float) && is_numeric($float)) {
+            if(filter_var($float, FILTER_VALIDATE_FLOAT)) {
+                if($float >= 0 && $float <= 10) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private function doMedia(array $array) : float {
         $media = array_sum($array) / count($array);
         return (float) number_format($media, 2);
+    }
+
+    private function captureNotasErrors(array $notas) : bool{
+        foreach ($notas as $nota){
+            if(!$this->validateFloat($nota) || $nota === null || count($notas) > 3  || count($notas) < 3){
+                return false;
+            }
+        }
+        return true;
     }
 }
