@@ -480,21 +480,11 @@ class EjerciciosController extends BaseController
 
         $errors = [];
         foreach($data as $asignatura => $alumnos){
-            if(!is_string($asignatura) || !$this->validateString($asignatura || is_numeric($asignatura)) ){
-                $errors['asignatura'][$asignatura] = "Error: La asignatura " . $asignatura . " no puede estar vacia y debe de ser un campo de texto.";
-            }
+
             $aprobados = 0;
             $suspensos = 0;
             $mediaForAlumnoArr = [];
             foreach ($alumnos as $alumno => $notas) {
-                if (!$this->validateString($alumno)) {
-                    $errors['alumno'][$alumno] = "Error: El alumno " . $alumno . " no puede estar vacio y debe de ser un campo de texto.";
-                }
-                if (!is_array($notas) || $notas === []) {
-                    $errors['notas'][$alumno] = "Error: las notas del alumno " . $alumno . " no pueden estar vacias.";
-                }
-                
-
 
                 if(is_array($notas) && !empty($notas) || !$notas === [] ) {
                     //Medias de cada Asignartura
@@ -506,11 +496,6 @@ class EjerciciosController extends BaseController
                     $media = null;
                 }
 
-
-                if (empty($medias) || $medias === []) {
-                $errors['media'][$asignatura] = "Error: Ha ocurrido un error al realizar el calculo de la media de la asignatura.";
-                }
-
                 // Numero de aprobados y suspensos;
                 if ($media >= 5) {
                     $aprobados++;
@@ -518,35 +503,12 @@ class EjerciciosController extends BaseController
                     $suspensos++;
                 }
 
-                if(!isset($aprobados) || $aprobados === null){
-                    $errors['aprobados'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos aprobados";
-                } else if (isset($suspensos) && $suspensos === null) {
-                    $errors['suspensos'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos suspensos";
-                }
-
                 //Notas minimas y maximas;
                 $max = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr ==  [] ? max($mediaForAlumnoArr) : null;
                 $min = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr == []  ? min($mediaForAlumnoArr) : null;
 
-                if(!$max || $max === null || !$this->validateFloat($max)){
-                    $errors['maxNotas'][$asignatura]= "Error: Ha ocurrido un error en la busqueda de la nota maxima de la asignatura " . $asignatura . ".";
-                }
-
-                if(!$min || $min === null || !$this->validateFloat($min))  {
-                    $errors['minNotas'][$asignatura] = "Error: Ha ocurrido un error en la busqueda de la nota minima de la asignatura " . $asignatura . ".";
-                }
-
                 $alumnoNotaMax = array_search($max, $mediaForAlumnoArr);
                 $alumnoNotaMin = array_search($min, $mediaForAlumnoArr);
-
-                if(!$alumnoNotaMax || $alumnoNotaMax === null || !$this->validateString($alumnoNotaMax)){
-                    $errors['alumnoNotaMax'][$alumno] = "Error: Ha ocurrido un error en la busqueda de la nota maxima del alumno " . $alumno . " la asignatura.";
-                }
-
-                if (!$alumnoNotaMin || $alumnoNotaMin === null || !$this->validateString($alumnoNotaMin)){
-                    $errors['alumnosNotaMin'] = "Error: Ha ocurrido un error en la busqueda de la nota minima del alumno " . $alumno . " la asignatura.";;
-                }
-
 
 
                 $maxNotas = [
@@ -558,6 +520,42 @@ class EjerciciosController extends BaseController
                     'alumno' => $alumnoNotaMin,
                     'nota' => $min
                 ];
+
+                if(!is_string($asignatura) || !$this->validateString($asignatura) || is_numeric($asignatura) ){
+                    $errors['asignatura'][$asignatura] = "Error: La asignatura " . $asignatura . " no puede estar vacia y debe de ser un campo de texto.";
+                }else {
+                    if (!$this->validateString($alumno)) {
+                        $errors['alumno'][$alumno] = "Error: El alumno " . $alumno . " no puede estar vacio y debe de ser un campo de texto.";
+                    }
+                    if (!is_array($notas) || $notas === []) {
+                        $errors['notas'][$alumno] = "Error: las notas del alumno " . $alumno . " no pueden estar vacias.";
+                    }
+                    if (empty($medias) || $medias === []) {
+                        $errors['media'][$asignatura] = "Error: Ha ocurrido un error al realizar el calculo de la media de la asignatura.";
+                    }
+
+                    if(!isset($aprobados) || $aprobados === null){
+                        $errors['aprobados'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos aprobados";
+                    } else if (isset($suspensos) && $suspensos === null) {
+                        $errors['suspensos'] = "Error: Ha ocurrido un error al realizar el conteo de alumnos suspensos";
+                    }
+
+                    if(!$max || $max === null || !$this->validateFloat($max)){
+                        $errors['maxNotas'][$asignatura]= "Error: Ha ocurrido un error en la busqueda de la nota maxima de la asignatura " . $asignatura . ".";
+                    }
+
+                    if(!$min || $min === null || !$this->validateFloat($min))  {
+                        $errors['minNotas'][$asignatura] = "Error: Ha ocurrido un error en la busqueda de la nota minima de la asignatura " . $asignatura . ".";
+                    }
+                    if(!$alumnoNotaMax || $alumnoNotaMax === null || !$this->validateString($alumnoNotaMax)){
+                        $errors['alumnoNotaMax'][$alumno] = "Error: Ha ocurrido un error en la busqueda de la nota maxima del alumno " . $alumno . " la asignatura.";
+                    }
+
+                    if (!$alumnoNotaMin || $alumnoNotaMin === null || !$this->validateString($alumnoNotaMin)){
+                        $errors['alumnosNotaMin'] = "Error: Ha ocurrido un error en la busqueda de la nota minima del alumno " . $alumno . " la asignatura.";;
+                    }
+
+                }
             }
 
 
@@ -570,7 +568,12 @@ class EjerciciosController extends BaseController
                     'nota minima' => $minNotas
                 ];
             }
+
         }
+        if(empty($data) || $data === []){
+            $errors['array']['data'] = "Error: El Json esta vacío o peude que se le este pasando un numero entero como nombre de la asignatura";
+        }
+
         if(!empty($errors) || !$errors === []){
             return ['errores' => $errors];
         }else{
@@ -619,22 +622,54 @@ class EjerciciosController extends BaseController
         return (float) number_format($media, 2);
     }
 
-    private function captureNotasErrors(array $notas) : bool{
-        foreach ($notas as $nota){
-            if(!$this->validateFloat($nota)){
-                return false;
-            }
-        }
-        return true;
+    /********************************** Pedidos Clientes ***********************************/
+
+    public function pedidosClientes()
+    {
+        $data = array(
+            'titulo' => 'Pedidos y Clientes',
+            'breadcrumb' => ['Inicio', 'Pedidos y Clientes']
+        );
+
+        $this->view->showViews(array('templates/header.view.php', 'pedidosClientes.view.php', 'templates/footer.view.php'), $data);
     }
 
-    private function validateIs_NotNumber($string): bool
+    /**
+     * @return View
+     */
+    public function doPedidosClientes()
     {
-        for($i=0; $i<strLen($string); $i++){
-            if(is_numeric($string[$i])){
-                return false;
-            }
+        $data = array(
+            'titulo' => 'Pedidos y Clientes',
+            'breadcrumb' => ['Inicio', 'Pedidos Y Clientes']
+        );
+
+        //Procesamienteo de datos
+        $data['input'] = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        $data['inputPedidos'] = $_POST['pedidos'] ?? '';
+        $data['inputClientes'] = $_POST['clientes'] ?? '';
+
+        $data['pedidosJson'] = $this->validateJsonAndTransformToArray($data['inputPedidos']);
+        $data['clientesJson'] = $this->validateJsonAndTransformToArray($data['inputClientes']);
+
+        if (($data['pedidosJson'] && is_array($data['pedidosJson'])) && ($data['clientesJson'] && is_array($data['clientesJson']))) {
+            $data['_successful'] = 'Sucess: Los datos an sido insertados correctamente';
+        }else {
+            $data['_errores'] = 'Error: Alguno de los registros no an sido insertados correctamente';
         }
-        return true;
+
+
+        $this->view->showViews(array('templates/header.view.php', 'pedidosClientes.view.php', 'templates/footer.view.php'), $data);
     }
+
+    private function checkErrors(){
+
+    }
+
+
+
+
+
+
 }

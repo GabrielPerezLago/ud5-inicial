@@ -160,6 +160,29 @@ class FrontController
         );
 
         /**
+         * @PedidosClientes
+         * Aqui se invocan las rutasa del ejercicio PedidosClientes
+         *
+         */
+         Route::add(
+             '/pedidosClientes',
+             function() {
+                 $controller = new EjerciciosController();
+                 $controller->pedidosClientes();
+             },
+             'get'
+         );
+         Route::add(
+             '/pedidosClientes',
+             function() {
+                 $controller = new EjerciciosController();
+                 $controller->doPedidosClientes();
+             },
+             'post'
+         );
+         
+         
+        /**
          * @ControladoresDefault
          */
 
