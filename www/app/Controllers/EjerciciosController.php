@@ -493,6 +493,7 @@ class EjerciciosController extends BaseController
                 if (!is_array($notas) || $notas === []) {
                     $errors['notas'][$alumno] = "Error: las notas del alumno " . $alumno . " no pueden estar vacias.";
                 }
+                
 
 
                 if(is_array($notas) && !empty($notas) || !$notas === [] ) {
