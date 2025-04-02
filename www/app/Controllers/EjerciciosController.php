@@ -480,7 +480,7 @@ class EjerciciosController extends BaseController
 
         $errors = [];
         foreach($data as $asignatura => $alumnos){
-            if(filter_var($asignatura, FILTER_VALIDATE_FLOAT) || !$this->validateString($asignatura)){
+            if(!is_string($asignatura) || !$this->validateString($asignatura || is_numeric($asignatura)) ){
                 $errors['asignatura'][$asignatura] = "Error: La asignatura " . $asignatura . " no puede estar vacia y debe de ser un campo de texto.";
             }
             $aprobados = 0;
@@ -507,7 +507,7 @@ class EjerciciosController extends BaseController
 
 
                 if (empty($medias) || $medias === []) {
-                $errors['media'] = "Error: Ha ocurrido un error al realizar el calculo de la media de la asignatura.";
+                $errors['media'][$asignatura] = "Error: Ha ocurrido un error al realizar el calculo de la media de la asignatura.";
                 }
 
                 // Numero de aprobados y suspensos;
@@ -524,26 +524,26 @@ class EjerciciosController extends BaseController
                 }
 
                 //Notas minimas y maximas;
-                $max = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr ===  [] ? max($mediaForAlumnoArr) : null;
-                $min = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr ===  []  ? min($mediaForAlumnoArr) : null;
+                $max = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr ==  [] ? max($mediaForAlumnoArr) : null;
+                $min = is_array($mediaForAlumnoArr) && !$mediaForAlumnoArr == []  ? min($mediaForAlumnoArr) : null;
 
                 if(!$max || $max === null || !$this->validateFloat($max)){
-                    $errors['maxNotas'] = "Error: Ha ocurrido un error en la busqueda de la nota maxima de la asignatura.";
+                    $errors['maxNotas'][$asignatura]= "Error: Ha ocurrido un error en la busqueda de la nota maxima de la asignatura " . $asignatura . ".";
                 }
 
                 if(!$min || $min === null || !$this->validateFloat($min))  {
-                    $errors['minNotas'] = "Error: Ha ocurrido un error en la busqueda de la nota minima de la asignatura.";
+                    $errors['minNotas'][$asignatura] = "Error: Ha ocurrido un error en la busqueda de la nota minima de la asignatura " . $asignatura . ".";
                 }
 
                 $alumnoNotaMax = array_search($max, $mediaForAlumnoArr);
                 $alumnoNotaMin = array_search($min, $mediaForAlumnoArr);
 
                 if(!$alumnoNotaMax || $alumnoNotaMax === null || !$this->validateString($alumnoNotaMax)){
-                    $errors['alumnoNotaMax'] = "Error: Ha ocurrido un error en la busqueda del alumno con la nota maxima de la asignatura.";
+                    $errors['alumnoNotaMax'][$alumno] = "Error: Ha ocurrido un error en la busqueda de la nota maxima del alumno " . $alumno . " la asignatura.";
                 }
 
                 if (!$alumnoNotaMin || $alumnoNotaMin === null || !$this->validateString($alumnoNotaMin)){
-                    $errors['alumnosNotaMin'] = "Error: Ha ocurrido un error en la busqueda del alumno con la nota minima de la asignatura.";
+                    $errors['alumnosNotaMin'] = "Error: Ha ocurrido un error en la busqueda de la nota minima del alumno " . $alumno . " la asignatura.";;
                 }
 
 
@@ -621,6 +621,16 @@ class EjerciciosController extends BaseController
     private function captureNotasErrors(array $notas) : bool{
         foreach ($notas as $nota){
             if(!$this->validateFloat($nota)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function validateIs_NotNumber($string): bool
+    {
+        for($i=0; $i<strLen($string); $i++){
+            if(is_numeric($string[$i])){
                 return false;
             }
         }
