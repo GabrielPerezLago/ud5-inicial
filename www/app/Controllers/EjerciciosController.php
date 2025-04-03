@@ -654,7 +654,10 @@ class EjerciciosController extends BaseController
         $data['clientesJson'] = $this->validateJsonAndTransformToArray($data['inputClientes']);
 
         if (($data['pedidosJson'] && is_array($data['pedidosJson'])) && ($data['clientesJson'] && is_array($data['clientesJson']))) {
-            $data['_successful'] = 'Sucess: Los datos an sido insertados correctamente';
+            $_results = $this->checkErrorsPedidosClientes($data['pedidosJson']);
+            if(isset($_results) && !empty($_results)) {
+                $data['_successful'] = $_results;
+            }
         }else {
             $data['_errores'] = 'Error: Alguno de los registros no an sido insertados correctamente';
         }
@@ -663,13 +666,25 @@ class EjerciciosController extends BaseController
         $this->view->showViews(array('templates/header.view.php', 'pedidosClientes.view.php', 'templates/footer.view.php'), $data);
     }
 
-    private function checkErrors(){
 
+    private function checkErrorsPedidosClientes(array $arrPedidos, array $arrClietes): array {
+        $errors = [];
+
+        foreach ($arrPedidos as $posicion => $pedidos){
+            foreach ($pedidos as $clave => $pedido) {
+                if(empty($arrClietes) || $arrClietes === []){
+                    $errors[$posicion] = "";
+                }
+            }
+        }
+
+        foreach ($arrClietes as $posicion => $clientes){
+            foreach ($clientes as $clave => $cliente){
+
+            }
+        }
+
+
+        return $errors;
     }
-
-
-
-
-
-
 }

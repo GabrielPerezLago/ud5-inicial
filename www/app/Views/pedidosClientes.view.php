@@ -35,7 +35,7 @@
                     </div>
             </form>
             <?php
-                if (isset($_errores) && empty($_errores) && isset($pedidosJson) && !$pedidosJson == '') {
+                if (!isset($_errores) || empty($_errores) && isset($pedidosJson) && !$pedidosJson == '') {
             ?>
                 <div class="col">
                     <div class="row">
