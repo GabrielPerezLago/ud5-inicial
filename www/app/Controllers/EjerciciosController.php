@@ -654,10 +654,8 @@ class EjerciciosController extends BaseController
         $data['clientesJson'] = $this->validateJsonAndTransformToArray($data['inputClientes']);
 
         if (($data['pedidosJson'] && is_array($data['pedidosJson'])) && ($data['clientesJson'] && is_array($data['clientesJson']))) {
-            $_results = $this->checkErrorsPedidosClientes($data['pedidosJson']);
-            if(isset($_results) && !empty($_results)) {
-                $data['_successful'] = $_results;
-            }
+            $_results = $this-> manejoPedidosClientes($data['pedidosJson'], $data['clientesJson']);
+            $data['_resultados'] = $_results;
         }else {
             $data['_errores'] = 'Error: Alguno de los registros no an sido insertados correctamente';
         }
@@ -666,6 +664,28 @@ class EjerciciosController extends BaseController
         $this->view->showViews(array('templates/header.view.php', 'pedidosClientes.view.php', 'templates/footer.view.php'), $data);
     }
 
+    private function manejoPedidosClientes(array $arrPedidos, array $arrClietes) : array
+    {
+        $resultados = [];
+        $n_clientes = null;
+        foreach ($arrClietes as $cliente) {
+            foreach ($cliente as $clave => $dato) {
+                foreach ($arrPedidos as $pedido) {
+                    foreach ($pedido as $key => $value) {
+                        $codigo_cliente = array_column($arrPedidos, 'codigo_cliente');
+
+                    }
+
+                    $n_clientes = array_count_values($codigo_cliente);
+                }
+                $resultados = [
+                    'numero de clientes' => $n_clientes,
+                ];
+            }
+            
+        }
+        return $resultados;
+    }
 
     private function checkErrorsPedidosClientes(array $arrPedidos, array $arrClietes): array {
         $errors = [];
