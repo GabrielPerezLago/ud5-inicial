@@ -39,8 +39,8 @@
             ?>
                 <div class="col">
                     <div class="row">
-                        <div class="alert alert-success col-lg-12">
-                            <?php echo $_successful ?>
+                        <div class="alert text-black col-lg-12">
+                            <?php echo isset($_resultados) ? $_resultados : '' ?>
                         </div>
                     </div>
                 </div>
