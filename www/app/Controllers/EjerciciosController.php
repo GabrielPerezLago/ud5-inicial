@@ -668,10 +668,25 @@ class EjerciciosController extends BaseController
     {
         $resultados = [];
         $pedidosPorCliente = [];
-
+        $contar_articulos = [];
         foreach ($pedidos as $pedido) {
             foreach ($pedido as $clavePedido => $valor) {
-                $pedidosPorCliente = array_count_values(array_column($pedidos, 'codigo_cliente'));
+                $pedidosPorCliente = $this->contarColumnasArray($pedidos, 'codigo_cliente');
+
+                if(is_array($valor)){
+                    $articulos = $valor;
+                    foreach ($articulos as $articulo) {
+                        foreach ($articulo as $claveDatos => $datosArticulo) {
+                            $contar_articulos = $this->contarColumnasArray($articulos, 'codigo_producto');
+                            $datos = $contar_articulos;
+                        }
+                    }
+                }
+                $resultados[$clavePedido['articulos']] =
+                    [
+                      'articulo' => $valor,
+                        'codigo_cliente' => $contar_articulos
+                    ];
             }
 
         }
@@ -717,5 +732,11 @@ class EjerciciosController extends BaseController
 
 
         return $errors;
+    }
+
+
+    private function contarColumnasArray(array $array, String $columna): array
+    {
+        return array_count_values(array_column($array, $columna));
     }
 }

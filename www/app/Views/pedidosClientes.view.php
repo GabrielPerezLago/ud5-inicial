@@ -39,10 +39,16 @@
             ?>
                 <div class="col">
                     <div class="row">
+                        <?php
+                        if(!isset($_resultados)){
+                        $_resultados = '';
+                        }else{
+                            ?>
                         <div class="alert alert-success col-lg-12">
                             <p class="text-black">Clientes con al menos 1 pedido:</p>
                             <?php
-                            foreach ($_resultados as $clientes) {
+
+                             foreach ($_resultados as $clientes) {
                                 foreach ($clientes as $clave => $cliente) {
                                     if($clave == 'conPedidos') {
                                         echo $cliente . '<br>';
@@ -53,19 +59,22 @@
                         </div>
                         <div class="alert alert-danger col-lg-12">
                             <?php
-                            foreach ($_resultados as $clientes){
+                            foreach ($_resultados as $clientes) {
                                 foreach ($clientes as $clave => $cliente) {
-                                    if($clave == 'sinPedidos') {
+                                    if ($clave == 'sinPedidos') {
                                         echo $cliente . '<br>';
                                     }
                                 }
                             }
                             ?>
                         </div>
+                        <?php echo $_resultados ?>
+
                     </div>
                 </div>
 
             <?php
+                            }
                 } else{
 
             ?>
@@ -78,4 +87,6 @@
                     </div>
             <?php
                 }
+
             ?>
+

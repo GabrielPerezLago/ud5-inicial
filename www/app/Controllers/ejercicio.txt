@@ -1,0 +1,1 @@
+tengo que hacer que me aparezcan por pantalla los 10 articulos con cantidades mas vendidas , y que me apazcan  ordenados de mas a menos vendidos
