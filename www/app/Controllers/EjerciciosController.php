@@ -664,26 +664,37 @@ class EjerciciosController extends BaseController
         $this->view->showViews(array('templates/header.view.php', 'pedidosClientes.view.php', 'templates/footer.view.php'), $data);
     }
 
-    private function manejoPedidosClientes(array $arrPedidos, array $arrClietes) : array
+    private function manejoPedidosClientes(array $pedidos, array $clientes) : array
     {
         $resultados = [];
-        $n_clientes = null;
-        foreach ($arrClietes as $cliente) {
-            foreach ($cliente as $clave => $dato) {
-                foreach ($arrPedidos as $pedido) {
-                    foreach ($pedido as $key => $value) {
-                        $codigo_cliente = array_column($arrPedidos, 'codigo_cliente');
+        $pedidosPorCliente = [];
 
-                    }
-
-                    $n_clientes = array_count_values($codigo_cliente);
-                }
-                $resultados = [
-                    'numero de clientes' => $n_clientes,
-                ];
+        foreach ($pedidos as $pedido) {
+            foreach ($pedido as $clavePedido => $valor) {
+                $pedidosPorCliente = array_count_values(array_column($pedidos, 'codigo_cliente'));
             }
-            
+
         }
+
+        foreach ($clientes as $cliente) {
+            foreach ($cliente as $clavesCliente => $datos) {
+                foreach ($pedidosPorCliente as $idCliente => $contador) {
+                    if($idCliente == $cliente['codigo_cliente']) {
+                        if($contador >= 1){
+                            $resultados[$cliente['codigo_cliente']] = [
+                                'conPedidos' => $cliente['nombre_cliente']
+                            ];
+                        }else {
+                            $resultados[$cliente['codigo_cliente']] = [
+                                'sinPedidos' => $cliente['nombre_cliente']
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+
         return $resultados;
     }
 
@@ -707,6 +718,4 @@ class EjerciciosController extends BaseController
 
         return $errors;
     }
-
-    sdfas
 }

@@ -39,8 +39,28 @@
             ?>
                 <div class="col">
                     <div class="row">
-                        <div class="alert text-black col-lg-12">
-                            <?php echo isset($_resultados) ? $_resultados : '' ?>
+                        <div class="alert alert-success col-lg-12">
+                            <p class="text-black">Clientes con al menos 1 pedido:</p>
+                            <?php
+                            foreach ($_resultados as $clientes) {
+                                foreach ($clientes as $clave => $cliente) {
+                                    if($clave == 'conPedidos') {
+                                        echo $cliente . '<br>';
+                                    }
+                                }
+                            }
+                            ?>
+                        </div>
+                        <div class="alert alert-danger col-lg-12">
+                            <?php
+                            foreach ($_resultados as $clientes){
+                                foreach ($clientes as $clave => $cliente) {
+                                    if($clave == 'sinPedidos') {
+                                        echo $cliente . '<br>';
+                                    }
+                                }
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>
