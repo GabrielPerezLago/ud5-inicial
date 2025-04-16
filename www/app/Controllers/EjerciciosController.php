@@ -666,48 +666,58 @@ class EjerciciosController extends BaseController
 
     private function manejoPedidosClientes(array $pedidos, array $clientes) : array
     {
+        //Guardado de los resultados en $resultados
         $resultados = [];
+
+        //Manejadores de datos
         $pedidosPorCliente = [];
         $contar_articulos = [];
+        $clientesProcesados = [];
+
         foreach ($pedidos as $pedido) {
-            foreach ($pedido as $clavePedido => $valor) {
-                $pedidosPorCliente = $this->contarColumnasArray($pedidos, 'codigo_cliente');
+            $pedidosPorCliente = $this->contarColumnasArray($pedidos, 'codigo_cliente');
+            if(isset($pedido['articulos']) && is_array($pedido['articulos'])){
+                foreach ($pedido['articulos'] as $articulo) {
+                    $codigoArticulo = $articulo['codigo_producto'];
+                    $cantidadVendida = $articulo['cantidad'];
+                    $proveedor = $articulo['proveedor'];
+                    $nombreProducto = $articulo['nombre'];
 
-                if(is_array($valor)){
-                    $articulos = $valor;
-                    foreach ($articulos as $articulo) {
-                        foreach ($articulo as $claveDatos => $datosArticulo) {
-                            $contar_articulos = $this->contarColumnasArray($articulos, 'codigo_producto');
-                            $datos = $contar_articulos;
-                        }
+                    if (!isset($contar_articulos[$codigoArticulo])) {
+                        $contar_articulos[$codigoArticulo] = [
+                            'cantidad' => 0,
+                            'proveedor' => $proveedor,
+                            'nombre' => $nombreProducto
+                        ];
                     }
-                }
-                $resultados[$clavePedido['articulos']] =
-                    [
-                      'articulo' => $valor,
-                        'codigo_cliente' => $contar_articulos
-                    ];
-            }
+                    $contar_articulos[$codigoArticulo]['cantidad'] += $cantidadVendida;
 
+
+                }
+            }
         }
+
+        $datosFiltrados = $this->filtrarDatos($contar_articulos);
+        $resultados['mas_vendidos'] = $datosFiltrados;
 
         foreach ($clientes as $cliente) {
-            foreach ($cliente as $clavesCliente => $datos) {
-                foreach ($pedidosPorCliente as $idCliente => $contador) {
-                    if($idCliente == $cliente['codigo_cliente']) {
-                        if($contador >= 1){
-                            $resultados[$cliente['codigo_cliente']] = [
-                                'conPedidos' => $cliente['nombre_cliente']
-                            ];
-                        }else {
-                            $resultados[$cliente['codigo_cliente']] = [
-                                'sinPedidos' => $cliente['nombre_cliente']
-                            ];
-                        }
+            foreach ($pedidosPorCliente as $idCliente => $contador) {
+                if($idCliente == $cliente['codigo_cliente']) {
+                    if($contador >= 1){
+                        $clientesProcesados['con_pedidos'][] = [
+                            'codigo_cliente' => $cliente['codigo_cliente'],
+                            'nombre_cliente' => $cliente['nombre_cliente']
+                        ];
+                    }else {
+                        $clientesProcesados['sin_pedidos'][] = [
+                            'codigo_cliente' => $cliente['codigo_cliente'],
+                            'nombre_cliente' => $cliente['nombre_cliente']
+                        ];
                     }
                 }
             }
         }
+        $resultados['clientes'] = $clientesProcesados;
 
 
         return $resultados;
@@ -738,5 +748,18 @@ class EjerciciosController extends BaseController
     private function contarColumnasArray(array $array, String $columna): array
     {
         return array_count_values(array_column($array, $columna));
+    }
+
+    private function filtrarDatos(array $array) : array {
+        arsort($array);
+        $resultados = [];
+        foreach ($array as $claveArray => $valorArray) {
+            if(count($resultados) < 10) {
+                $resultados[$claveArray] = $valorArray;
+            }else{
+                return $resultados;
+            }
+        }
+        return $resultados;
     }
 }

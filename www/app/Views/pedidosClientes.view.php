@@ -44,34 +44,62 @@
                         $_resultados = '';
                         }else{
                             ?>
+                            <div class="container">
+                            <?php
+                            foreach ($_resultados as $claveDatos => $datos) {
+                                if($claveDatos == 'clientes') {
+                                    foreach ($datos as $key => $clientes){
+                                        if($key == 'con_pedidos') {
+                            ?>
                         <div class="alert alert-success col-lg-12">
                             <p class="text-black">Clientes con al menos 1 pedido:</p>
                             <?php
 
-                             foreach ($_resultados as $clientes) {
-                                foreach ($clientes as $clave => $cliente) {
-                                    if($clave == 'conPedidos') {
-                                        echo $cliente . '<br>';
-                                    }
-                                }
-                            }
+                                            foreach ($clientes as $cliente) {
+                                                $codigo = $cliente['codigo_cliente'];
+                                                $nombre = $cliente['nombre_cliente'];
+                                                echo $codigo . ' : ' . $nombre . '<br>';
+                                            }
+
                             ?>
                         </div>
+                        <?php
+                        }   else if($key == 'sin_pedidos') {
+                        ?>
                         <div class="alert alert-danger col-lg-12">
                             <?php
-                            foreach ($_resultados as $clientes) {
-                                foreach ($clientes as $clave => $cliente) {
-                                    if ($clave == 'sinPedidos') {
-                                        echo $cliente . '<br>';
-                                    }
-                                }
+                                            foreach ($clientes as $cliente) {
+                                                $codigo = $cliente['codigo_cliente'];
+                                                $nombre = $cliente['nombre_cliente'];
+                                                echo $codigo. ' : ' . $nombre . '</br>';
+                                            }
                             }
                             ?>
                         </div>
-                        <?php echo $_resultados ?>
-
+                                <?php
+                                    }
+                                }
+                            }
+                                ?>
+                            </div>
+                            <div class="alert alert-info col-lg-12">
+                                <p class="text-black">¡Los 10 productos más vendidos!</p>
+                                <?php
+                                foreach ($_resultados as $claveDatos => $datos) {
+                                    if (is_array($datos) && $claveDatos == 'mas_vendidos') {
+                                        foreach ($datos as $claveProducto => $datosProducto) {
+                                            $nombre = $datosProducto['nombre'];
+                                            $proveedor = $datosProducto['proveedor'];
+                                            $cantidad = $datosProducto['cantidad'];
+                                            echo $claveProducto . ' - ' . $nombre . ' - ' . $proveedor . ' - ' . $cantidad . '<br>';
+                                        }
+                                    }
+                                }
+                                ?>
+                            </div>
                     </div>
                 </div>
+
 
             <?php
                             }
