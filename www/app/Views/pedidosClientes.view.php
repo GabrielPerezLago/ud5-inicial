@@ -97,6 +97,20 @@
                                 }
                                 ?>
                             </div>
+                            <div class="alert alert-warning">
+                                <?php
+                                foreach ($_resultados as $clave => $resultdo) {
+                                    if ($clave == 'pedidos_mas_cuantia'){
+                                        foreach ($resultdo as $clave => $pedidos) {
+                                            $codigo = $clave;
+                                            $nombreCliente = $pedidos['nombre_cliente'];
+                                            $cuantia = $pedidos['cuantia'];
+                                            echo $codigo . ' : ' . $nombreCliente . ' - ' . $cuantia . '€' . '<br>';
+                                        }
+                                    }
+                                }
+                                ?>
+                            </div>
                     </div>
                 </div>
 
@@ -115,6 +129,4 @@
                     </div>
             <?php
                 }
-
             ?>
-

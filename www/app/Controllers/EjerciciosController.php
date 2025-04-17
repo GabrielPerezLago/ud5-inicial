@@ -673,15 +673,22 @@ class EjerciciosController extends BaseController
         $pedidosPorCliente = [];
         $contar_articulos = [];
         $clientesProcesados = [];
+        $calculoCuantias = [];
+        $pedidosMasCuantia = [];
 
         foreach ($pedidos as $pedido) {
             $pedidosPorCliente = $this->contarColumnasArray($pedidos, 'codigo_cliente');
+            $codigoPedido = $pedido['codigo_pedido'];
+            $nombreCliente = $pedido['nombre_cliente'];
             if(isset($pedido['articulos']) && is_array($pedido['articulos'])){
                 foreach ($pedido['articulos'] as $articulo) {
                     $codigoArticulo = $articulo['codigo_producto'];
                     $cantidadVendida = $articulo['cantidad'];
                     $proveedor = $articulo['proveedor'];
                     $nombreProducto = $articulo['nombre'];
+                    $precioUnidad = $articulo['precio_unidad'];
+                    $cantidad = $articulo['cantidad'];
+
 
                     if (!isset($contar_articulos[$codigoArticulo])) {
                         $contar_articulos[$codigoArticulo] = [
@@ -691,14 +698,16 @@ class EjerciciosController extends BaseController
                         ];
                     }
                     $contar_articulos[$codigoArticulo]['cantidad'] += $cantidadVendida;
-
-
                 }
+                $calculoCuantias[$codigoPedido] =[
+                    'nombre_cliente' => $nombreCliente,
+                    'cuantia' => $this->calcularCuantia($pedido['articulos'], 'precio_unidad', 'cantidad')
+                ];
             }
         }
+        $datosFiltrados = $this->filtrarDatos($contar_articulos, true, 10);
+        $pedidosMasCuantia = $this->filtrarDatos($calculoCuantias, false);
 
-        $datosFiltrados = $this->filtrarDatos($contar_articulos);
-        $resultados['mas_vendidos'] = $datosFiltrados;
 
         foreach ($clientes as $cliente) {
             foreach ($pedidosPorCliente as $idCliente => $contador) {
@@ -717,8 +726,13 @@ class EjerciciosController extends BaseController
                 }
             }
         }
-        $resultados['clientes'] = $clientesProcesados;
 
+        $resultados = [
+            'clientes' => $clientesProcesados,
+            'mas_vendidos' => $datosFiltrados,
+            'cuantias' => $calculoCuantias,
+            'pedidos_mas_cuantia' => $pedidosMasCuantia
+        ];
 
         return $resultados;
     }
@@ -745,21 +759,54 @@ class EjerciciosController extends BaseController
     }
 
 
+    /**
+     * @param array $array
+     * @param String $columna
+     * @return array
+     * Funcion que recibe un array bidimensional y cuenta los valores de la columna especificada
+     */
     private function contarColumnasArray(array $array, String $columna): array
     {
         return array_count_values(array_column($array, $columna));
     }
 
-    private function filtrarDatos(array $array) : array {
+    /**
+     * @param array $array
+     * @param bool $limitar
+     * @param Int $limitador
+     * @return array
+     * Esta funcion se encarga de ordenar el array en orden descendete
+     * y si se inserta true como parametro en $limitar se limita el array a los primeros resultados
+     * indicados en el tercer parametro $limitador.
+     */
+    private function filtrarDatos(array $array, bool $limitar, Int $limitador = 0) : array {
         arsort($array);
         $resultados = [];
         foreach ($array as $claveArray => $valorArray) {
-            if(count($resultados) < 10) {
-                $resultados[$claveArray] = $valorArray;
-            }else{
-                return $resultados;
+            if($limitar == true){
+                if(count($resultados) < $limitador) {
+                    $resultados[$claveArray] = $valorArray;
+                }else{
+                    return $resultados;
+                }
+            } else{
+                return $array;
             }
         }
-        return $resultados;
+        return $array;
     }
+
+    private function calcularCuantia(array $array, String $precio, String $cantidad) : float {
+        $cuantias = [];
+        $resultados = null;
+        foreach($array as $valor) {
+            $precioUnidad = $valor[$precio];
+            $catidadVentas = $valor[$cantidad];
+
+            $cuantias[] = $precioUnidad * $catidadVentas;
+        }
+        return array_sum($cuantias);
+    }
+
+
 }
