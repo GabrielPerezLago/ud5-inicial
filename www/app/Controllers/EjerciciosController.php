@@ -706,7 +706,7 @@ class EjerciciosController extends BaseController
             }
         }
         $datosFiltrados = $this->filtrarDatos($contar_articulos, true, 10);
-        $pedidosMasCuantia = $this->filtrarDatos($calculoCuantias, false);
+        $pedidosMasCuantia = $this->filtrarDatos($calculoCuantias, false, 0, 'cuantia');
 
 
         foreach ($clientes as $cliente) {
@@ -779,21 +779,51 @@ class EjerciciosController extends BaseController
      * y si se inserta true como parametro en $limitar se limita el array a los primeros resultados
      * indicados en el tercer parametro $limitador.
      */
-    private function filtrarDatos(array $array, bool $limitar, Int $limitador = 0) : array {
-        arsort($array);
+    private function filtrarDatos(array $array, bool $limitar,Int $limitador = 0, String $ordenacion = null) : array {
+        $arraySimple = null;
+        if (is_array(reset($array)) && $ordenacion !== null) {
+            $arraySimple = $this->simplificarArray($array, $ordenacion);
+            arsort($arraySimple);
+        }else {
+            arsort($array);
+        }
+
         $resultados = [];
-        foreach ($array as $claveArray => $valorArray) {
-            if($limitar == true){
-                if(count($resultados) < $limitador) {
-                    $resultados[$claveArray] = $valorArray;
-                }else{
+
+        foreach ($arraySimple ?? $array as $clave => $valor){
+            if(!$limitar){
+                if($arraySimple){
+                    $resultados[$clave] = $array[$clave];
+                }else {
+                    $resultados[$clave] = $valor;
+                }
+            }else {
+                if(count($resultados) < $limitador){
+                    if($arraySimple){
+                        $resultados[$clave] = $array[$clave];
+                    }else {
+                        $resultados[$clave] = $valor;
+                    }
+                }else {
                     return $resultados;
                 }
-            } else{
-                return $array;
             }
         }
-        return $array;
+        return $resultados;
+
+
+    }
+
+    private function simplificarArray(array $array, String $ordenacion) : array{
+        $arraySimple = [];
+        foreach ($array as $clave => $valor) {
+            if(is_array($valor)){
+                $arraySimple[$clave] = $valor[$ordenacion];
+            }else {
+                return $arraySimple = $array;
+            }
+        }
+        return $arraySimple;
     }
 
     private function calcularCuantia(array $array, String $precio, String $cantidad) : float {
