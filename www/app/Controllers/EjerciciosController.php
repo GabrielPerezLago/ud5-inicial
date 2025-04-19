@@ -674,21 +674,20 @@ class EjerciciosController extends BaseController
         $contar_articulos = [];
         $clientesProcesados = [];
         $calculoCuantias = [];
-        $pedidosMasCuantia = [];
-
+        $totalGastado = [];
+        $clientesMasGasto = [];
         foreach ($pedidos as $pedido) {
             $pedidosPorCliente = $this->contarColumnasArray($pedidos, 'codigo_cliente');
             $codigoPedido = $pedido['codigo_pedido'];
             $nombreCliente = $pedido['nombre_cliente'];
+            $codigoCliente = $pedido['codigo_cliente'];
+
             if(isset($pedido['articulos']) && is_array($pedido['articulos'])){
                 foreach ($pedido['articulos'] as $articulo) {
                     $codigoArticulo = $articulo['codigo_producto'];
                     $cantidadVendida = $articulo['cantidad'];
                     $proveedor = $articulo['proveedor'];
                     $nombreProducto = $articulo['nombre'];
-                    $precioUnidad = $articulo['precio_unidad'];
-                    $cantidad = $articulo['cantidad'];
-
 
                     if (!isset($contar_articulos[$codigoArticulo])) {
                         $contar_articulos[$codigoArticulo] = [
@@ -698,16 +697,32 @@ class EjerciciosController extends BaseController
                         ];
                     }
                     $contar_articulos[$codigoArticulo]['cantidad'] += $cantidadVendida;
+
                 }
                 $calculoCuantias[$codigoPedido] =[
                     'nombre_cliente' => $nombreCliente,
                     'cuantia' => $this->calcularCuantia($pedido['articulos'], 'precio_unidad', 'cantidad')
                 ];
+                if(!isset($totalGastado[$pedido['codigo_cliente']])){
+                    $totalGastado[$pedido['codigo_cliente']] = 0;
+                }
+                $totalGastado[$codigoCliente] += $this->calcularCuantia($pedido['articulos'], 'precio_unidad', 'cantidad');
+                foreach ($pedidosPorCliente as $pClave => $pValor) {
+                    foreach ($totalGastado as $tClave => $tValor){
+                        if($pClave == $codigoCliente && $tClave == $codigoCliente){
+                            $clientesMasGasto[$codigoCliente] = [
+                                'nombre_cliente' => $nombreCliente,
+                                'numero_pedidos' => $pValor,
+                                'total_gastado' => $tValor
+                            ];
+                        }
+                    }
+                }
             }
         }
         $datosFiltrados = $this->filtrarDatos($contar_articulos, true, 10);
         $pedidosMasCuantia = $this->filtrarDatos($calculoCuantias, false, 0, 'cuantia');
-
+        $clientesFiltrados = $this->filtrarDatos($clientesMasGasto, true, 15, 'total_gastado');
 
         foreach ($clientes as $cliente) {
             foreach ($pedidosPorCliente as $idCliente => $contador) {
@@ -731,7 +746,8 @@ class EjerciciosController extends BaseController
             'clientes' => $clientesProcesados,
             'mas_vendidos' => $datosFiltrados,
             'cuantias' => $calculoCuantias,
-            'pedidos_mas_cuantia' => $pedidosMasCuantia
+            'pedidos_mas_cuantia' => $pedidosMasCuantia,
+            'clientes_mas_gastos' => $clientesFiltrados
         ];
 
         return $resultados;
@@ -846,7 +862,6 @@ class EjerciciosController extends BaseController
      */
     private function calcularCuantia(array $array, String $precio, String $cantidad) : float {
         $cuantias = [];
-        $resultados = null;
         foreach($array as $valor) {
             $precioUnidad = $valor[$precio];
             $catidadVentas = $valor[$cantidad];

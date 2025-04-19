@@ -52,7 +52,7 @@
                                         if($key == 'con_pedidos') {
                             ?>
                         <div class="alert alert-success col-lg-12">
-                            <p class="text-black">Clientes con al menos 1 pedido:</p>
+                            <h3 class="text-black">Clientes con al menos 1 pedido:</h3>
                             <?php
 
                                             foreach ($clientes as $cliente) {
@@ -67,7 +67,8 @@
                         }   else if($key == 'sin_pedidos') {
                         ?>
                         <div class="alert alert-danger col-lg-12">
-                            <?php
+                                            <h3 class="text-black">Clientes con al menos 1 pedido:</h3>
+                                            <?php
                                             foreach ($clientes as $cliente) {
                                                 $codigo = $cliente['codigo_cliente'];
                                                 $nombre = $cliente['nombre_cliente'];
@@ -83,7 +84,7 @@
                                 ?>
                             </div>
                             <div class="alert alert-info col-lg-12">
-                                <p class="text-black">¡Los 10 productos más vendidos!</p>
+                                <h3 class="text-black">¡Los 10 productos más vendidos!</h3>
                                 <?php
                                 foreach ($_resultados as $claveDatos => $datos) {
                                     if (is_array($datos) && $claveDatos == 'mas_vendidos') {
@@ -98,6 +99,7 @@
                                 ?>
                             </div>
                             <div class="alert alert-warning">
+                                <h3>Pedidos con más Cuantia</h3>
                                 <?php
                                 foreach ($_resultados as $clave => $resultdo) {
                                     if ($clave == 'pedidos_mas_cuantia'){
@@ -110,6 +112,36 @@
                                     }
                                 }
                                 ?>
+                            </div>
+                            <div class="container">
+                                <table class="table">
+                                    <tr>
+                                        <th>Codigo Cliente</th>
+                                        <th>Nombre Cliente</th>
+                                        <th>Total Pedidos</th>
+                                        <th>Total Gastado</th>
+                                    </tr>
+                                    <?php
+                                       foreach ($_resultados as $clave => $resultdo) {
+                                           if ($clave == 'clientes_mas_gastos') {
+                                               foreach ($resultdo as $claveCliete => $datosCLiente) {
+                                                   $codigo = $claveCliete;
+                                                   $nombre = $datosCLiente['nombre_cliente'];
+                                                   $pedidos = $datosCLiente['numero_pedidos'];
+                                                   $gastos = $datosCLiente['total_gastado'];
+                                                   ?>
+                                                   <tr>
+                                                       <td><?php echo $codigo ?></td>
+                                                       <td><?php echo $nombre ?></td>
+                                                       <td><?php echo $pedidos ?></td>
+                                                       <td><?php echo $gastos ?></td>
+                                                   </tr>
+                                                   <?php
+                                                }
+                                           }
+                                       }
+                                    ?>
+                                </table>
                             </div>
                     </div>
                 </div>
