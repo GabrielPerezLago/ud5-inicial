@@ -774,10 +774,13 @@ class EjerciciosController extends BaseController
      * @param array $array
      * @param bool $limitar
      * @param Int $limitador
+     * @param String|null $ordenacion
      * @return array
-     * Esta funcion se encarga de ordenar el array en orden descendete
-     * y si se inserta true como parametro en $limitar se limita el array a los primeros resultados
-     * indicados en el tercer parametro $limitador.
+     * Esta funcion se encarga de filtrar los datos de un array -- $array --
+     * Si se desea limitar el array se le pasa como parametro true -- $limitar --
+     * Si se desea limitar el array a un numero de elementos se le pasa como parametro -- $limitador --
+     * Si el array es bidimensiol se le pasa la columa por la que se quiere ordenar -- $ordenacion --
+     * esta funcion debuelve el arrayordenado y si se le ha pasado un limitador saca el numero de parametros que se indican
      */
     private function filtrarDatos(array $array, bool $limitar,Int $limitador = 0, String $ordenacion = null) : array {
         $arraySimple = null;
@@ -810,15 +813,21 @@ class EjerciciosController extends BaseController
             }
         }
         return $resultados;
-
-
     }
 
-    private function simplificarArray(array $array, String $ordenacion) : array{
+    /**
+     * @param array $array
+     * @param String $ordenacion
+     * @return array
+     * Esta funcion recibe un array bidimensional -- $array --
+     * Y recibe la columna que se desea guardar -- $columna --
+     * Y con esto simplifica el array guardando la clave y la columna seleccionada
+     */
+    private function simplificarArray(array $array, String $columna) : array{
         $arraySimple = [];
         foreach ($array as $clave => $valor) {
             if(is_array($valor)){
-                $arraySimple[$clave] = $valor[$ordenacion];
+                $arraySimple[$clave] = $valor[$columna];
             }else {
                 return $arraySimple = $array;
             }
@@ -826,6 +835,15 @@ class EjerciciosController extends BaseController
         return $arraySimple;
     }
 
+    /**
+     * @param array $array
+     * @param String $precio
+     * @param String $cantidad
+     * @return float
+     * Esta funcion se encarga de calcular la cuantia de los productos -- $array
+     * Recibe tambien una columna de precio y una de cantidad -- $precio - $cantidad
+     * Con todo eso calcula la cuantia total de ca pate del array
+     */
     private function calcularCuantia(array $array, String $precio, String $cantidad) : float {
         $cuantias = [];
         $resultados = null;
