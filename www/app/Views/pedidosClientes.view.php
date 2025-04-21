@@ -157,7 +157,12 @@
                             <div class="alert text-danger col-lg-12">
                                 <?php
                                 foreach ($_errores as $eValor){
-                                    echo $eValor;
+                                    if(is_array($eValor)){
+                                        foreach ($eValor as $erValor){
+                                            echo $erValor . '<br>';
+                                        }
+                                    }
+
                                 }
                                 ?>
                             </div>

@@ -654,7 +654,7 @@ class EjerciciosController extends BaseController
         $data['clientesJson'] = $this->validateJsonAndTransformToArray($data['inputClientes']);
 
 
-        if(is_array($this->checkErrorsPedidosClientes($data['pedidosJson'], $data['clientesJson']))) {
+        if(!is_array($this->checkErrorsPedidosClientes($data['pedidosJson'], $data['clientesJson']))) {
             $_results = $this-> manejoPedidosClientes($data['pedidosJson'], $data['clientesJson']);
             $data['_resultados'] = $_results;
         }else {
@@ -756,11 +756,17 @@ class EjerciciosController extends BaseController
 
     private function checkErrorsPedidosClientes(array $arrPedidos, array $arrClietes): bool|array {
         $errors = [];
-        if (!is_array($arrPedidos || !is_array($arrClietes) )) {
-            $errors['arrays_iniciales'] = 'Error: Alguno de los registros no an sido insertados correctamente';
-            if ($arrPedidos == [] || $arrClietes == []) {
-                $errors['arrays_vacios'] = 'Error: Alguno de los registros no an sigo insetados correctamente';
-            }
+        if(!is_array($arrPedidos) || $arrPedidos == []){
+            $errors['array_pedidos']['array_vacio'] = 'Error: A ocurrido un error al insertar los pedidos o los datos insertados no son correctos.';
+        }
+        if(!is_array($arrClietes) || $arrClietes == []){
+            $errors['array_clientes']['array_vacio'] = 'Error: A ocurrido un error al insertar los clientes o los datos insertados no son correctos.';
+        }
+        if(!is_array(reset($arrPedidos))){
+            $errors['array_pedidos']['array_normal'] = 'Error: Los datos insertados de los pedidos no son correctos , debe introducir todos los datos.';
+        }
+        if(!is_array(reset($arrClietes))){
+            $errors['array_clientes']['array_normal'] = 'Error: Los datos de los clientes no son correctos , debe introducir todos los datos.';
         }
         return $errors == [] ? true : $errors;
     }
