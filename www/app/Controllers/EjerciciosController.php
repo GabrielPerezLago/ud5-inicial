@@ -762,11 +762,40 @@ class EjerciciosController extends BaseController
         if(!is_array($arrClietes) || $arrClietes == []){
             $errors['array_clientes']['array_vacio'] = 'Error: A ocurrido un error al insertar los clientes o los datos insertados no son correctos.';
         }
+
+        if (isset($errors['array_clientes']['array_vacio']) || isset($errors['array_clientes']['array_vacio'])){
+            return $errors;
+        }
+
         if(!is_array(reset($arrPedidos))){
             $errors['array_pedidos']['array_normal'] = 'Error: Los datos insertados de los pedidos no son correctos , debe introducir todos los datos.';
         }
         if(!is_array(reset($arrClietes))){
             $errors['array_clientes']['array_normal'] = 'Error: Los datos de los clientes no son correctos , debe introducir todos los datos.';
+        }
+
+        foreach ($arrPedidos as $pedido) {
+            if (!isset($pedido['codigo_pedido']) || $pedido['codigo_pedido'] === '') {
+                $errors['array_pedidos']['codigo_pedido'] = 'Error: El codigo del pedido no puede estar vacio.';
+            }
+            if (!isset($pedido['nombre_cliente']) || $pedido['nombre_cliente'] === '') {
+                $errors['array_pedidos']['nombre_cliente'] = 'Error: El nombre del cliente en pedidos es obligatorio';
+            }
+            if (!isset($pedido['codigo_cliente']) || $pedido['codigo_cliente'] === '') {
+                $errors['array_pedidos']['codigo_cliente'] = 'Error: El codigo del cliente en los pedidos es obligatorio.';
+            }
+            if(!isset($pedido['articulos']) || !is_array($pedido['articulos']) || $pedido['articulos'] == []){
+                $errors['array_pedidos']['articulos'] = 'Error: Son necesarios los articulos de cada pedido.';
+            }
+        }
+
+        foreach ($arrClietes as $cliente) {
+            if (!isset($cliente['codigo_cliente']) || $cliente['codigo_cliente'] === '') {
+                $errors['array_clientes']['codigo_cliente'] = 'Error: El codigo del cliente en clientes es obligatorio.';
+            }
+            if (!isset($cliente['nombre_cliente']) || $cliente['nombre_cliente'] === '') {
+                $errors['array_array']['nombre_cliente'] = 'Error: El nombre del cliente en los clientes es obligatorio.';
+            }
         }
         return $errors == [] ? true : $errors;
     }
