@@ -653,11 +653,12 @@ class EjerciciosController extends BaseController
         $data['pedidosJson'] = $this->validateJsonAndTransformToArray($data['inputPedidos']);
         $data['clientesJson'] = $this->validateJsonAndTransformToArray($data['inputClientes']);
 
-        if (($data['pedidosJson'] && is_array($data['pedidosJson'])) && ($data['clientesJson'] && is_array($data['clientesJson']))) {
+
+        if(is_array($this->checkErrorsPedidosClientes($data['pedidosJson'], $data['clientesJson']))) {
             $_results = $this-> manejoPedidosClientes($data['pedidosJson'], $data['clientesJson']);
             $data['_resultados'] = $_results;
         }else {
-            $data['_errores'] = 'Error: Alguno de los registros no an sido insertados correctamente';
+            $data['_errores'] = $this->checkErrorsPedidosClientes($data['pedidosJson'], $data['clientesJson']);
         }
 
 
@@ -753,25 +754,15 @@ class EjerciciosController extends BaseController
         return $resultados;
     }
 
-    private function checkErrorsPedidosClientes(array $arrPedidos, array $arrClietes): array {
+    private function checkErrorsPedidosClientes(array $arrPedidos, array $arrClietes): bool|array {
         $errors = [];
-
-        foreach ($arrPedidos as $posicion => $pedidos){
-            foreach ($pedidos as $clave => $pedido) {
-                if(empty($arrClietes) || $arrClietes === []){
-                    $errors[$posicion] = "";
-                }
+        if (!is_array($arrPedidos || !is_array($arrClietes) )) {
+            $errors['arrays_iniciales'] = 'Error: Alguno de los registros no an sido insertados correctamente';
+            if ($arrPedidos == [] || $arrClietes == []) {
+                $errors['arrays_vacios'] = 'Error: Alguno de los registros no an sigo insetados correctamente';
             }
         }
-
-        foreach ($arrClietes as $posicion => $clientes){
-            foreach ($clientes as $clave => $cliente){
-
-            }
-        }
-
-
-        return $errors;
+        return $errors == [] ? true : $errors;
     }
 
 

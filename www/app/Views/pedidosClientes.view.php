@@ -35,7 +35,7 @@
                     </div>
             </form>
             <?php
-                if (!isset($_errores) || empty($_errores) && isset($pedidosJson) && !$pedidosJson == '') {
+                if (!isset($_errores) || empty($_errores)) {
             ?>
                 <div class="col">
                     <div class="row">
@@ -154,8 +154,12 @@
             ?>
                     <div class="col">
                         <div class="row">
-                            <div class="alert alert-danger col-lg-12">
-                                <?php echo $_errores ?>
+                            <div class="alert text-danger col-lg-12">
+                                <?php
+                                foreach ($_errores as $eValor){
+                                    echo $eValor;
+                                }
+                                ?>
                             </div>
                         </div>
                     </div>
