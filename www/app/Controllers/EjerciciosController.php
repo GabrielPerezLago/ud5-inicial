@@ -695,6 +695,7 @@ class EjerciciosController extends BaseController
                             'cantidad' => 0,
                             'proveedor' => $proveedor,
                             'nombre' => $nombreProducto
+
                         ];
                     }
                     $contar_articulos[$codigoArticulo]['cantidad'] += $cantidadVendida;
